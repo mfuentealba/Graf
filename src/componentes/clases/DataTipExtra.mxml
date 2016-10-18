@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:DataTip xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			xmlns:s="library://ns.adobe.com/flex/spark" 
+			xmlns:mx="library://ns.adobe.com/flex/mx">
+	<fx:Script>
+		<![CDATA[
+			import mx.charts.HitData;
+			import mx.core.IFlexModuleFactory;
+			import mx.core.IUITextField;
+			import mx.core.UITextField;
+			import mx.graphics.SolidColorStroke;
+			private var _hitData:HitData;
+			private var _label:IUITextField;
+			private var stroke:SolidColorStroke = new SolidColorStroke(0, 0, 1);
+			
+			override public function set data(value:Object):void
+			{
+				// TODO Auto Generated method stub
+				
+				_hitData = HitData(value);
+				_hitData.dataTipFunction = formatDataTip;
+				stroke = new SolidColorStroke(_hitData.contextColor, 0, 100);
+				setText(_hitData.displayText);
+				
+				invalidateDisplayList();
+				//lblSec.text = data.sec + '';
+			}
+			
+			private function formatDataTip(hd:HitData):String
+			{
+				var dt:String = "";
+				
+				var n:String = hd.element['legendData'][0]['label'];
+				if (n && n != "")
+					dt += "<b>" + n + "</b><BR/>";
+
+				var xName:String = 'Secuencia';//dataTransform.getAxis(CartesianTransform.HORIZONTAL_AXIS).displayName;
+				if (xName != "")
+					dt += "<i>" + xName+ ":</i> ";
+				dt += hd.item['sec']/*dataTransform.getAxis(CartesianTransform.HORIZONTAL_AXIS).formatForScreen(
+					LineSeriesItem(hd.chartItem).xValue)*/ + "\n";
+				
+				var yName:String = "Cantidad";//dataTransform.getAxis(CartesianTransform.VERTICAL_AXIS).displayName;
+				if (yName != "")
+					dt += "<i>" + yName + ":</i> ";
+				dt += hd.item['movAcum' + hd.element['legendData'][0]['label']]/*dataTransform.getAxis(CartesianTransform.VERTICAL_AXIS).formatForScreen(
+					LineSeriesItem(hd.chartItem).yValue)*/ + "\n";
+				
+				return dt;
+			}
+			
+			
+			private function setText(t:String):void
+			{
+				// Make sure the text styles are applied.
+				// However, we don't want leftMargin and rightMargin
+				// of the TextField's TextFormat to be set to the
+				// paddingLeft and paddingRight of the ToolTip style.
+				// We want these styles to affect the space between the
+				// TextField and the border, but not the margins within
+				// the TextField.
+				var _format:TextFormat = _label.getTextFormat();
+				_format.leftMargin = 0;
+				_format.rightMargin = 0;
+				_label.defaultTextFormat = _format;
+				
+				_label.htmlText = t;
+				
+				invalidateSize();
+			}
+			
+			override protected function createChildren():void
+			{
+				// TODO Auto Generated method stub
+				super.createChildren();
+				
+				// Create the TextField that displays the DataTip text.
+				if (!_label)
+				{
+					_label = IUITextField(createInFontContext(UITextField));
+					
+					_label.x = getStyle("paddingLeft")
+					_label.y = getStyle("paddingTop");
+					_label.autoSize = TextFieldAutoSize.LEFT;
+					_label.selectable = false;
+					_label.multiline = true;
+					
+					addChild(DisplayObject(_label));
+				}
+			}
+			
+			/*override public function get data():Object
+			{
+				// TODO Auto Generated method stub
+				return super.data;
+			}
+			
+			override protected function measure():void
+			{
+				// TODO Auto Generated method stub
+				super.measure();
+			}
+			
+			
+			
+			override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void
+			{
+				// TODO Auto Generated method stub
+				super.updateDisplayList(unscaledWidth, unscaledHeight);
+			}*/
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<!--<s:Label id="lblSec"/>-->
+</mx:DataTip>

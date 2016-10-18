@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:flexlib="http://code.google.com/p/flexlib/">
+	
+	<mx:HBox width="100%" height="100%">
+    	
+    	<mx:CartesianChart id="bigChart" 
+    		width="100%" height="100%"
+    		gutterLeft="50" gutterRight="50" gutterBottom="60" gutterTop="60"
+    		showDataTips="true" 
+    		dataProvider="{mainData}" >
+        
+	        <mx:horizontalAxis>
+	        	<mx:CategoryAxis categoryField="x"/>
+	        </mx:horizontalAxis>
+	        
+	        <mx:horizontalAxisRenderers>
+	        	<mx:AxisRenderer placement="{horizontalAxisPlacement}" />
+	        </mx:horizontalAxisRenderers>
+	        
+	        <mx:verticalAxis>
+	        	<mx:LinearAxis maximum="{maxVAxis}" />
+	        </mx:verticalAxis>
+	        
+	        <mx:verticalAxisRenderers>
+	        	<mx:AxisRenderer placement="{verticalAxisPlacement}"  />
+	        </mx:verticalAxisRenderers>
+	        
+	        <mx:series>
+	            <mx:AreaSeries name="y" yField="y" 
+	            	areaFill="{areaColor}"  areaStroke="{areaStroke}" />
+	        </mx:series>
+	        
+	        <mx:annotationElements>
+	            <mx:Canvas width="100%" height="100%" 
+	            	buttonMode="true" mouseDown="setMouseDown(bigChart)" />
+	        </mx:annotationElements>
+	        
+	    </mx:CartesianChart>
+    </mx:HBox>
+    
+    <mx:Spacer height="{gapBetweenCharts}" />
+    
+    <mx:VBox verticalGap="0" width="100%" verticalScrollPolicy="off" horizontalAlign="left" >
+        
+        <mx:CartesianChart id="smallChart" 
+        	width="100%" height="100"
+        	dataProvider="{chartData}" 
+        	showDataTips="true" >
+            
+            <mx:horizontalAxis>
+            	<mx:CategoryAxis categoryField="x"/>
+            </mx:horizontalAxis>
+            
+            <mx:horizontalAxisRenderers>
+            	<mx:AxisRenderer visible="false" />
+            </mx:horizontalAxisRenderers>
+            
+            <mx:verticalAxis>
+            	<mx:LinearAxis />
+            </mx:verticalAxis>
+            
+            <mx:verticalAxisRenderers>
+            	<mx:AxisRenderer visible="false" />
+            </mx:verticalAxisRenderers>
+            
+            <mx:series>
+                <mx:AreaSeries name="y" yField="y" 
+                	areaStroke="{areaStroke}" areaFill="{areaColor}" />
+            </mx:series>
+            
+            <mx:annotationElements>
+                <mx:HDividedBox id="overlayCanvas" width="100%" alpha="1" dividerAffordance="5" liveDragging="true" horizontalGap="10" verticalGap="0" horizontalScrollPolicy="off" 
+                                dividerDrag="updateBoundariesFromDivider(event)" dividerSkin="{blankDividerClass}"
+                                mouseOver="overlayCanvas.setStyle('dividerSkin', dividerClass);" mouseOut="overlayCanvas.setStyle('dividerSkin', blankDividerClass);">
+                    <mx:Canvas id="leftBox" height="100%"
+                               width="{(overlayCanvas.width / chartData.length) * leftBoundary}" 
+                               backgroundAlpha="0.4" backgroundColor="#EEEEEE" borderThickness="1" borderColor="#999999" borderStyle="solid" />
+                    <mx:Canvas id="visibleBox" width="100%" height="100%" buttonMode="true" mouseDown="setMouseDown(smallChart)" />
+                    <mx:Canvas id="rightBox" height="100%" 
+                               width="{(overlayCanvas.width / chartData.length) * (chartData.length - rightBoundary)}" 
+                               backgroundAlpha="0.4" backgroundColor="#EEEEEE" borderThickness="1" borderColor="#999999" borderStyle="solid"/>
+                </mx:HDividedBox>
+            </mx:annotationElements>
+            
+        </mx:CartesianChart>
+        
+        <mx:Spacer height="-40" />
+        
+      <!--  <mx:HBox horizontalGap="0">
+        	<mx:Spacer width="24" />
+        	
+        	<flexlib:HSlider id="slider" width="{overlayCanvas.width + 12}"  height="25"
+                        trackHighlightSkin="flexlib.skins.SliderThumbHighlightSkin"
+                        trackSkin="EmptySkin"
+                        allowTrackClick="true" allowThumbOverlap="false" 
+                        liveDragging="true" change="updateBoundariesFromSlider()"
+                        showDataTip="true" dataTipPlacement="bottom" dataTipOffset="3"
+                        showTrackHighlight="true"
+                        thumbCount="2" snapInterval="1"
+                        values="{[leftBoundary, rightBoundary]}"
+                        minimum="0" maximum="{chartData.length - 1}"
+                        />
+        </mx:HBox>-->
+                        
+         <mx:Spacer height="{gapAtBottom}" />
+    </mx:VBox>
+    
+    <mx:Script>
+        <![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.events.DividerEvent;
+			import mx.events.ResizeEvent;
+			import mx.graphics.SolidColor;
+			import mx.graphics.SolidColorStroke;
+			import mx.graphics.Stroke;
+			import mx.managers.SystemManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.http.HTTPService;
+            
+            [Embed(source="img/divider.png")] [Bindable] public var dividerClass:Class;
+            [Embed(source="img/blank.png")] [Bindable] public var blankDividerClass:Class;
+            
+            
+            private var DATA_LENGTH:Number = 500;
+            private var LEFT_START:Number = 150;
+            private var RIGHT_START:Number = 250;
+            [Bindable] public var chartData:ArrayCollection;
+            [Bindable] public var mainData:ArrayCollection;
+            
+            [Bindable] private var leftBoundary:Number;
+            [Bindable] private var rightBoundary:Number;
+            
+            private var staticLeftBoundary:Number;
+            private var staticRightBoundary:Number;
+            
+            public var smallDrag:Boolean = false;
+            public var bigDrag:Boolean = false;
+            public var mouseXRef:Number;
+            
+            [Bindable]
+            public var maxVAxis:Number = 100;
+            
+            /* Some customizable colors for the ara fill and stroke. */
+            [Bindable]
+            public var areaColor:SolidColor = new SolidColor(0x0033CC, 0.5);
+            
+            [Bindable]
+            public var areaStroke:SolidColorStroke = new Stroke(0x0033CC, 2);
+            
+            /* Two spacer heights, these are used to determine the layout of the
+             * small chart versus the big chart.
+             */
+            [Bindable] 
+            public var gapBetweenCharts:Number = 0;
+            
+            [Bindable] 
+            public var gapAtBottom:Number = 0;
+            
+            /* Some customizable variables to affect the layout of the axes */
+            [Bindable]
+            public var horizontalAxisPlacement:String = "top";
+            
+            [Bindable]
+            public var verticalAxisPlacement:String = "left";
+            
+            
+            public function loadData(url:String):void {
+            	var req:HTTPService = new HTTPService();
+            	req.resultFormat = "text";
+            	
+            	req.url = url;
+            	
+            	req.addEventListener(ResultEvent.RESULT, parseData);
+            	
+            	req.send();
+            }
+            
+            /**
+             * We're loading a CSV file, so all our data points are separated by newlines.
+             * We split the result, the loop over and create the dataprovider for the chart.
+             * The y field is the data point value, the x field is the index of the data point.
+             */
+            private function parseData(event:ResultEvent):void {
+            	var data:String = event.result as String;
+            	
+            	var array:Array = data.split("\r");
+            	
+            	var ac:ArrayCollection = new ArrayCollection();
+            	
+            	for(var i:int=0; i<array.length; i++) {
+            		ac.addItem({x:i, y:array[i]});	
+            	}
+            	
+            	chartData = ac;
+            	mainData = new ArrayCollection(chartData.source);
+            	leftBoundary = LEFT_START;
+                rightBoundary = RIGHT_START;
+                updateBoundariesFromSlider();
+            }
+            
+            
+            private function updateBoundariesFromSlider():void
+            {
+                /*leftBoundary = slider.values[0];
+                rightBoundary = slider.values[1];*/
+                updateMainData();
+            }
+            
+            private function updateBoundariesFromDivider(event:DividerEvent):void
+            {
+                leftBoundary = Math.abs(HDividedBox(event.target).getChildAt(0).width / (event.target.width / chartData.length));
+                rightBoundary = Math.abs(chartData.length - (HDividedBox(event.target).getChildAt(2).width / (event.target.width / chartData.length)));
+                updateMainData();
+            }
+            
+            private function updateMainData():void
+            {
+                mainData.source = chartData.source.slice(leftBoundary, rightBoundary)
+            }
+
+            private function setMouseDown(theChart:CartesianChart):void
+            {
+                mouseXRef = this.mouseX;
+                staticLeftBoundary = leftBoundary;
+                staticRightBoundary = rightBoundary;
+                if(theChart == bigChart) bigDrag = true;
+                if(theChart == smallChart) smallDrag = true;
+                this.systemManager.addEventListener(MouseEvent.MOUSE_MOVE, moveChart);
+                this.systemManager.addEventListener(MouseEvent.MOUSE_UP, stopDragging);
+            }
+            
+            private function stopDragging(event:MouseEvent):void
+            {
+                smallDrag = false;
+                bigDrag = false;
+                this.systemManager.removeEventListener(MouseEvent.MOUSE_MOVE, moveChart);
+                this.systemManager.removeEventListener(MouseEvent.MOUSE_UP, stopDragging);
+            }
+            
+            private function moveChart(event:MouseEvent):void
+            {
+                if(bigDrag)
+                {
+                    leftBoundary = staticLeftBoundary + (mouseXRef - this.mouseX) / (bigChart.width / mainData.length);
+                    rightBoundary = staticRightBoundary + (mouseXRef - this.mouseX) / (bigChart.width / mainData.length);
+                }
+                else if(smallDrag)
+                {
+                    leftBoundary = staticLeftBoundary - (mouseXRef - this.mouseX) / (smallChart.width / chartData.length);
+                    rightBoundary = staticRightBoundary - (mouseXRef - this.mouseX) / (smallChart.width / chartData.length);
+                }
+            }
+        ]]>
+    </mx:Script>
+
+</mx:VBox>

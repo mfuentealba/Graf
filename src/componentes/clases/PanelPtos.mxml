@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Panel xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="600" height="300">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.managers.PopUpManager;
+			protected function cerrar_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				PopUpManager.removePopUp(this);
+			}
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:ArrayCollection id="arrPtos"/>
+	</fx:Declarations>
+	<s:DataGrid x="61" y="13" requestedRowCount="4" width="100%" height="100%" dataProvider="{arrPtos}">
+		<s:columns>
+			<s:ArrayList>
+				<s:GridColumn dataField="sec" headerText="Secuencia"></s:GridColumn>
+				<s:GridColumn dataField="dist" headerText="Distancia"></s:GridColumn>
+				<s:GridColumn dataField="vela" headerText="Vela"></s:GridColumn>
+				<s:GridColumn dataField="accion" headerText="Accion"></s:GridColumn>
+			</s:ArrayList>
+		</s:columns>
+		
+	</s:DataGrid>
+	<s:Button label="Ok" click="cerrar_clickHandler(event)"/>
+</s:Panel>

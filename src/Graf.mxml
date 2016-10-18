@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+					   xmlns:s="library://ns.adobe.com/flex/spark"
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   xmlns:local="*"
+					   width="1576" height="935"
+					   creationComplete="windowedapplication1_creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import componentes.clases.PanelPtos;
+			
+			import controlador.Controlador;
+			
+			import eventos.GeneraDataEvent;
+			
+			import flash.sampler.NewObjectSample;
+			
+			import modelo.Modelo;
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			import spark.events.GridSelectionEvent;
+			import spark.events.TextOperationEvent;
+			
+			
+			
+			[Bindable] private var modelApp:Modelo = Modelo.getInstance();
+			private var expensesAC:ArrayCollection = new ArrayCollection( [
+				{ Date: "25-Jul", Open: 40.75,  High: 40.75, Low: 40.24, Close:40.31},
+				{ Date: "26-Jul", Open: 39.98,  High: 40.78, Low: 39.97, Close:40.34},
+				{ Date: "27-Jul", Open: 40.38,  High: 40.66, Low: 40, Close:40.63},
+				{ Date: "28-Jul", Open: 40.49,  High: 40.99, Low: 40.3, Close:40.98},
+				{ Date: "29-Jul", Open: 40.13,  High: 40.4, Low: 39.65, Close:39.95},
+				{ Date: "1-Aug", Open: 39.00,  High: 39.50, Low: 38.7, Close:38.6}, 
+				{ Date: "2-Aug", Open: 38.68,  High: 39.34, Low: 37.75, Close:38.84}, 
+				{ Date: "3-Aug", Open: 38.76,  High: 38.76, Low: 38.03, Close:38.12}, 
+				{ Date: "4-Aug", Open: 37.98,  High: 37.98, Low: 36.56, Close:36.69},                       
+				{ Date: "5-Aug", Open: 36.61,  High: 37, Low: 36.48, Close:36.86} ]);
+			
+			[Bindable]
+			private var expensesACTemp:ArrayCollection = new ArrayCollection();
+			private var i:int = 0;
+			
+			protected function rbTemporalidad_changeHandler(event:Event):void
+			{
+				// TODO Auto-generated method stub
+				switch(rbTemporalidad.selectedValue){
+					case 'M1':
+						modelApp.codPer = 60;
+						break;
+					case 'M5':
+						modelApp.codPer = 300;
+						break;
+					case 'M15':
+						modelApp.codPer = 900;
+						break;
+					case 'M30':
+						modelApp.codPer = 1800;
+						break;
+					case 'H1':
+						modelApp.codPer = 3600;
+						break;
+					case 'H4':
+						modelApp.codPer = 14400;
+						break;
+				}
+			}
+			
+			protected function btnIncremento_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				//grVelas.width += 10;
+				expensesACTemp.addItem(expensesAC.getItemAt(i));
+				
+				i++;
+			}
+			
+			protected function windowedapplication1_creationCompleteHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				modelApp.conexion.server = "127.0.0.1";
+				modelApp.conexion.port = 9004;
+				modelApp.conexion.ini();
+				
+				
+			}
+			
+			
+			protected function fnSearch(item:Object):Boolean{
+				return String(item['sec']).indexOf(txtSearch.text) > -1 ? true : false; 
+			}
+			
+			protected function fnGeneraData(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				modelApp.arrDataGraf = new ArrayCollection();
+				modelApp.arrDataGrafOrd = new ArrayCollection();
+				modelApp.arrDataGrafOrdExec = new ArrayCollection();
+				modelApp.arrDataNiveles = new ArrayCollection();
+				modelApp.objDataNiveles = {};
+				modelApp.objDataGrafOrdExec = {};
+				modelApp.txtEURUSDTotal = '0';
+				modelApp.txtUSDCHFTotal = '0';
+				var generaDataEvent:GeneraDataEvent = new GeneraDataEvent(GeneraDataEvent.GENERA_DATA);
+				Controlador.getInstance().dispatchEvent(generaDataEvent);
+			}
+			
+			protected function fnGeneraData2(event:MouseEvent):void
+			{
+				var generaDataEvent:GeneraDataEvent = new GeneraDataEvent(GeneraDataEvent.GENERA_PIP);
+				Controlador.getInstance().dispatchEvent(generaDataEvent);
+			}
+			
+			protected function fnGeneraData3(event:MouseEvent):void
+			{
+				var generaDataEvent:GeneraDataEvent = new GeneraDataEvent(GeneraDataEvent.GENERA_POR_PIP);
+				Controlador.getInstance().dispatchEvent(generaDataEvent);
+			}
+			
+			protected function fnReset(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				/*var obj:Object = {};
+				obj["movAcumUSDCHF"] = 0;
+				obj["movAcumEURUSD"] = 0;
+				obj["tendenciaEURUSD"] = 'N';
+				obj["tendenciaUSDCHF"] = 'N';*/
+				modelApp.arrDataGraf = new ArrayCollection();
+				//modelApp.arrDataGraf.addItem(obj);
+				modelApp.totalOperaciones = '0';
+				modelApp.arrDataGrafOrd = new ArrayCollection();
+				modelApp.arrDataGrafOrdExec = new ArrayCollection();
+				modelApp.arrDataNiveles = new ArrayCollection();
+				modelApp.objDataNiveles = {};
+				modelApp.arrDataGrafVelas = new ArrayCollection();
+				//modelApp.arrDataGrafVelas.addItem({Open: 0,  High: 0, Low: 0, Close:0});
+				modelApp.objDataGrafOrdExec = {};
+				modelApp.txtEURUSDTotal = '0';
+				modelApp.txtUSDCHFTotal = '0';
+				modelApp.codPerIn = 0;
+				Controlador.getInstance().fnProc = Controlador.getInstance().fnInicial;
+				var generaDataEvent:GeneraDataEvent = new GeneraDataEvent(GeneraDataEvent.RESET_PIP);
+				Controlador.getInstance().dispatchEvent(generaDataEvent);
+			}
+			
+			protected function fnGeneraNivel(event:MouseEvent):void
+			{
+				for each(var obj:Object in modelApp.arrDataGrafVelas){
+					obj['Nivel'] = int(String(dgNiveles.selectedItem['movIni']).split('|')[1]);
+				}
+				modelApp.arrDataGrafVelas.refresh();
+			}
+			
+			
+			protected function fnGeneraOrdenManual(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				var obj:Object = modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1];
+				
+				var item:Object = {};
+				/*item.fecha = obj.fechaTrans;
+				item.ganancia = -obj.spreadUSDCHF;
+				item.spread = -obj.spreadUSDCHF;
+				item.pip = 0;
+				item.num = 'USDCHF|' + obj['id'];
+				item.divisa = 'USDCHF';
+				item.tipo = event.target.label == 'Compra' ? 'C' : 'V';
+				item.movIni = obj["movAcumUSDCHF"];
+				item.estado = "Abierta";
+				i = modelApp.arrDataGrafOrdExec.source.push(item);
+				modelApp.objDataGrafOrdExec[item.num] = i - 1;
+				modelApp.arrDataGrafOrdExec.refresh();
+				
+				modelApp.totalOperaciones = (int(modelApp.totalOperaciones) + item.ganancia) + ''; 
+				*/
+				
+				item = {};
+				item.fecha = obj.fechaTrans;
+				item.ganancia = -obj.spreadEURUSD;
+				item.sl = int(txtStopLoss.text);
+				item.tp = int(txtTakeProfit.text);
+				item.spread = -obj.spreadEURUSD;
+				item.pip = 0;
+				item.num = 'EURUSD|' + obj['id']; 
+				item.divisa = 'EURUSD';
+				item.tipo = event.target.label == 'Compra' ? 'C' : 'V';
+				item.movIni = obj["movAcumEURUSD"];
+				item.estado = "Abierta";
+				modelApp.totalOperaciones = (int(modelApp.totalOperaciones) + item.ganancia) + '';
+				i = modelApp.arrDataGrafOrdExec.source.push(item);
+				modelApp.objDataGrafOrdExec[item.num] = i - 1;
+				modelApp.arrDataGrafOrdExec.refresh();
+				
+			}
+			
+			private function set fnMinMax(val:String):void{
+				if(int(modelApp.menorOperaciones) > int(val)){
+					modelApp.menorOperaciones = val;
+				}
+				
+				if(int(modelApp.mayorOperaciones) < int(val)){
+					modelApp.mayorOperaciones = val;
+				}
+			}
+			private function set fnNivel(val:Vector):void{
+				if(val != null){
+									
+					for each(var obj:Object in modelApp.arrDataGrafVelas){
+						obj['Nivel'] = int(String(dgNiveles.selectedItem['movIni']).split('|')[1]);
+					}
+					modelApp.arrDataGrafVelas.refresh();	
+				}
+				
+			}
+			
+			private function fnLimpiarNivel(ev:*):void{
+				dgNiveles.selectedItem = null;
+				dgNiveles.selectedItems = new Vector.<Object>;
+				dgNiveles_selectionChangeHandler(null);
+				
+			}
+			
+			protected function dgNiveles_selectionChangeHandler(event:GridSelectionEvent):void
+			{
+				// TODO Auto-generated method stub
+				var i:int = 0;
+				var c:CandlestickSeries = grVelas.series.shift();
+				grVelas.series = [];
+				grVelas.series.push(c);
+				for each(var obj:Object in dgNiveles.selectedItems){
+					var line:LineSeries = new LineSeries();
+					line.yField = 'data' + i;
+					line.displayName = obj.movIni;
+					grVelas.series.push(line);
+					for each(var obj2:Object in modelApp.arrDataGrafVelas){
+						obj2[line.yField] = int(String(obj['movIni']).split('|')[1]);
+					}
+					i++;
+				}
+				modelApp.arrDataGrafVelas.refresh();
+				
+			}
+			
+			protected function fnMuestraPtos(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				var panel:PanelPtos = new PanelPtos();
+				panel.arrPtos = dgNiveles.selectedItem['arrSec'];
+				PopUpManager.addPopUp(panel, Graf(Button(event.target).parentApplication), true);
+				PopUpManager.centerPopUp(panel);
+			}
+			
+			protected function generaActclickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				var generaDataEvent:GeneraDataEvent = new GeneraDataEvent(GeneraDataEvent.EPREFRESH);
+				Controlador.getInstance().dispatchEvent(generaDataEvent);
+			}
+			
+			protected function txtSearch_changeHandler(event:TextOperationEvent):void
+			{
+				// TODO Auto-generated method stub
+				if(txtSearch.text != ''){
+					modelApp.arrDataGrafPR.filterFunction = fnSearch;
+					modelApp.arrDataGrafPR.refresh();
+				} else {
+					modelApp.arrDataGrafPR.filterFunction = null;
+					modelApp.arrDataGrafPR.refresh();
+				}
+					
+				
+			}
+			
+		]]>
+	</fx:Script>
+	<!--<fx:Binding source="{dgNiveles.selectedItems}" destination="fnNivel"/>-->
+	<fx:Declarations>
+		
+		<!-- Define custom colors for the candles. -->
+		<mx:SolidColor id="up" color="green" alpha=".8"/>
+		<mx:SolidColor id="down" color="red" alpha=".8"/>
+		
+		<!-- Define custom Stroke for the candle wick. -->
+		<mx:SolidColorStroke id="wick" color="black" weight="2"/>
+		
+		<!-- Define custom Stroke for the candle box. -->
+		<mx:SolidColorStroke id="box" color="black" weight="1"/>
+		<s:RadioButtonGroup id="rbTemporalidad" change="rbTemporalidad_changeHandler(event)"/>
+	</fx:Declarations>
+	<fx:Binding source="{modelApp.totalOperaciones}" destination="fnMinMax"/>
+	<fx:Binding source="{modelApp.totalOperaciones}" destination="fnMinMax"/>
+	<mx:TabNavigator width="100%" height="100%">
+		<s:NavigatorContent width="100%" height="100%" label="Gráfica">
+			<s:VGroup width="100%" height="891">
+				<s:HGroup>
+					<s:RadioButton label="M1" groupName="rbTemporalidad" selected="true"/>
+					<s:RadioButton label="M5" groupName="rbTemporalidad"/>
+					<s:RadioButton label="M15" groupName="rbTemporalidad"/>
+					<s:RadioButton label="M30" groupName="rbTemporalidad"/>
+					<s:RadioButton label="H1" groupName="rbTemporalidad"/>
+					<s:RadioButton label="H4" groupName="rbTemporalidad"/>
+					<s:Button label="Genera Data" click="fnGeneraData(event)"/>
+					<s:Button label="Genera Data2" click="fnGeneraData2(event)"/>
+					<s:Button label="Genera por pip" click="fnGeneraData3(event)"/>
+					<s:Button label="Reset" click="fnReset(event)"/>
+					<s:Button label="Compra" click="fnGeneraOrdenManual(event)"/>
+					<s:Button label="Venta" click="fnGeneraOrdenManual(event)"/>
+					<s:Label text="{modelApp.txtSec}"/>
+					<s:Button label="LimpiarNiveles" click="fnLimpiarNivel(event)" enabled="{dgNiveles.selectedItem}"/>
+					<s:Button label="Muestra Puntos" click="fnMuestraPtos(event)" enabled="{dgNiveles.selectedItem}"/>
+				</s:HGroup>
+				<s:HGroup width="100%">
+					
+					<mx:CandlestickChart id="grVelas"
+										 height="100%" 
+										 width="100%"
+										 paddingRight="5" 
+										 paddingLeft="5" 
+										 showDataTips="true"
+										 dataProvider="{modelApp.arrDataGrafVelas}">
+						<mx:verticalAxis>
+							<mx:LinearAxis id="vaxis" baseAtZero="false" title="Price"/>
+						</mx:verticalAxis>
+						
+						<!--<mx:horizontalAxis>
+							<mx:CategoryAxis id="haxis" categoryField="sec" title="Date"/>
+						</mx:horizontalAxis>
+						
+						<mx:horizontalAxisRenderers>
+							<mx:AxisRenderer axis="{haxis}" canDropLabels="true"/>
+						</mx:horizontalAxisRenderers>-->
+						
+						<mx:series>
+							<mx:CandlestickSeries 
+								openField="Open" 
+								highField="High" 
+								lowField="Low" 
+								closeField="Close"
+								fill="{up}"
+								declineFill="{down}"
+								stroke="{wick}"
+								boxStroke="{box}"
+								/>
+							<!--<mx:LineSeries displayName="CIERRES" form="curve" yField="Nivel"/>-->
+						</mx:series>
+					</mx:CandlestickChart>
+					<mx:Legend dataProvider="{grVelas}"/>
+					<mx:LineChart id="areachart1" height="100%" visible="false" includeInLayout="false" dataProvider="{modelApp.arrDataGraf}" width="100%" showDataTips="true" dataTipRenderer="componentes.clases.DataTipExtra">
+						<mx:seriesFilters>
+							<fx:Array/>
+						</mx:seriesFilters>
+						<mx:series>
+							<mx:LineSeries displayName="EURUSD" form="curve" yField="movAcumEURUSD">
+								<mx:lineStroke>
+									<mx:SolidColorStroke 
+										color="RED" 
+										weight="2" 
+										alpha=".6"/>
+								</mx:lineStroke>     
+							</mx:LineSeries>
+							<mx:LineSeries displayName="USDCHF" form="curve" yField="movAcumUSDCHF"/>
+						</mx:series>
+					</mx:LineChart>
+					<s:DataGrid id="dgNiveles" selectionMode="multipleRows" selectionChange="dgNiveles_selectionChangeHandler(event)" x="483" y="10" width="30%" requestedRowCount="4" dataProvider="{modelApp.arrDataNiveles}" height="100%">
+						<s:columns>
+							<s:ArrayList>
+								<s:GridColumn dataField="divisa" headerText="Divisa"></s:GridColumn>
+								<s:GridColumn dataField="movIni" headerText="Num"></s:GridColumn>
+								<s:GridColumn dataField="cant" headerText="Cantidad"></s:GridColumn>
+								<s:GridColumn dataField="mov" headerText="Movimiento"></s:GridColumn>
+								<!--<s:GridColumn headerText="Movimiento">
+									<s:itemRenderer>
+										<fx:Component>
+											
+											
+											<s:Button label="ptos" click="button1_clickHandler(event)">
+												<fx:Script>
+													<![CDATA[
+														import componentes.clases.PanelPtos;
+														
+														import mx.collections.ArrayCollection;
+														import mx.controls.Button;
+														import mx.managers.PopUpManager;
+														
+														protected function button1_clickHandler(event:MouseEvent):void
+														{
+															// TODO Auto-generated method stub
+															var panel:PanelPtos = new PanelPtos();
+															panel.arrPtos = new ArrayCollection();
+															PopUpManager.addPopUp(panel, Graf(Button(event.target).parentApplication), true);
+															PopUpManager.centerPopUp(panel);
+														}
+													]]>
+												</fx:Script>	
+											</s:Button>
+											
+												
+											
+													  
+													  
+																		
+										</fx:Component>
+									</s:itemRenderer>
+								</s:GridColumn>-->
+							</s:ArrayList>
+						</s:columns>
+						
+					</s:DataGrid>
+				</s:HGroup>
+				
+				<mx:Legend dataProvider="{areachart1}"/>
+				
+				<s:HGroup>
+					<s:Label text="EURUSD"/>
+					<s:TextInput text="{modelApp.txtEURUSD}"/>
+					<s:Label text="USDCHF"/>
+					<s:TextInput text="{modelApp.txtUSDCHF}"/>
+					<s:Label text="Total operaciones"/>
+					<s:TextInput text="{modelApp.totalOperaciones}"/>
+					<s:Label text="Menor Valor"/>
+					<s:TextInput text="{modelApp.menorOperaciones}"/>
+					<s:Label text="Mayor Valor"/>
+					<s:TextInput text="{modelApp.mayorOperaciones}"/>
+					<s:Label text="SL"/>
+					<s:TextInput id="txtStopLoss" width="86"/>
+					<s:Label text="TP"/>
+					<s:TextInput id="txtTakeProfit" width="80"/>
+				</s:HGroup>
+				<s:HGroup width="100%" height="100%">
+					<s:DataGrid width="80%" height="100%" requestedRowCount="4" dataProvider="{modelApp.arrDataGrafOrdExec}">
+						<s:columns>
+							<s:ArrayList>
+								<s:GridColumn dataField="num" headerText="Num"></s:GridColumn>
+								<s:GridColumn dataField="fecha" headerText="Fecha"></s:GridColumn>
+								<s:GridColumn dataField="divisa" headerText="Symbol"></s:GridColumn>
+								<s:GridColumn dataField="tipo" headerText="Tipo"></s:GridColumn>
+								<s:GridColumn dataField="movIni" headerText="Inicio"></s:GridColumn>
+								<s:GridColumn dataField="pip" headerText="PIP"></s:GridColumn>
+								<s:GridColumn dataField="spread" headerText="Spread"></s:GridColumn>
+								<s:GridColumn dataField="ganancia" headerText="Ganancia"></s:GridColumn>
+								<s:GridColumn dataField="estado" headerText="Estado"></s:GridColumn>
+							</s:ArrayList>
+						</s:columns>
+						
+					</s:DataGrid>
+					
+					<s:Label text="EURUSD"/>
+					<s:TextInput text="{modelApp.txtEURUSDTotal}"/>
+					<s:Label text="USDCHF"/>
+					<s:TextInput text="{modelApp.txtUSDCHFTotal}"/>
+					
+				</s:HGroup>
+				
+					
+				
+				
+				
+				
+				<!--<local:ChartComponent id="chart1" width="100%" height="100%" 
+				horizontalAxisPlacement="top"
+				gapBetweenCharts="90"
+				maxVAxis="9" />
+				
+				<local:ChartComponent id="chart2" width="100%" height="100%" 
+				areaColor="{new SolidColor(0xff0000, 0.5)}" areaStroke="{new SolidColorStroke(0xff0000, 2)}"
+				horizontalAxisPlacement="bottom" verticalAxisPlacement="right"
+				gapAtBottom="90"  
+				maxVAxis="9" />-->
+				
+				
+				
+			</s:VGroup>
+		</s:NavigatorContent>
+		<s:NavigatorContent width="100%" height="100%" label="Ordenes">
+			<s:layout>
+				<s:HorizontalLayout gap="50"/>
+			</s:layout>
+			<s:DataGrid x="10" y="10" requestedRowCount="4" width="30%" dataProvider="{modelApp.arrDataGrafPR}" height="100%">
+				<s:columns>
+					<s:ArrayList>
+						<s:GridColumn dataField="sec" headerText="Sec"></s:GridColumn>
+						<s:GridColumn dataField="fecha" headerText="Fecha"></s:GridColumn>
+						<s:GridColumn dataField="precio_ask" headerText="Ask"></s:GridColumn>
+						<s:GridColumn dataField="precio_bid" headerText="Bid"></s:GridColumn>
+						
+					</s:ArrayList>
+				</s:columns>
+				
+			</s:DataGrid>
+			<s:Button label="genera Actualizacion" click="generaActclickHandler(event)"/>
+			<s:TextInput id="txtSearch" change="txtSearch_changeHandler(event)"/>
+		</s:NavigatorContent>
+	</mx:TabNavigator>
+	
+	
+	
+</s:WindowedApplication>
