@@ -98,7 +98,7 @@ function fnEURUSD(err, results, fields, arrParam){
 			segEP = parseInt(fechaEP.split(':')[2]);				
 			fechaEP_RESET = arrResultEURUSD[0]['fecha'].split(' ')[1];
 			minEP_RESET = parseInt(fechaEP.split(':')[1]);
-			segEP_RESET = parseInt(fechaEP.split(':')[2]);				
+			segEP_RESET = 0;//parseInt(fechaEP.split(':')[2]);				
 			
 		}
 	}	
@@ -614,9 +614,9 @@ function receiveData(socket, d) {
 					
 					//RowEURUSD.precio_bidUSDCHF = RowUSDCHF.precio_bid;
 					if(swEURUSD){
-						socket.write("RECEP|INIPIP|" + JSON.stringify(RowEURUSD) + "|" + sec + "|S|" + (arrProc.length > 1 ? "S" : "N") + arrOpt[1], 'utf8');
+						socket.write("RECEP|INIPIP|" + JSON.stringify(RowEURUSD) + "|" + sec + "|S|" + (cont == 0 ? "S" : "N") + "|" + arrOpt[1], 'utf8');						
 					} else {
-						socket.write("RECEP|INIPIP|" + JSON.stringify(RowEURUSD) + "|" + sec + "|N|" + arrOpt[1], 'utf8');
+						socket.write("RECEP|INIPIP|" + JSON.stringify(RowEURUSD) + "|" + sec + "|N|S|" + arrOpt[1], 'utf8');
 					}
 				}
 				
@@ -630,92 +630,98 @@ function receiveData(socket, d) {
 				console.log(arrOpt);
 				var valorVela = arrOpt[1];
 				console.log(valorVela);
-				for(var cont = 0; iEP < arrResultEURUSD.length && jEP < arrResultUSDCHF.length && cont < valorVela; iEP++, jEP++, sec++, cont++){
-					console.log('cont' + cont);
-					sleep(1);
+				for(var contt = 0; iEP < arrResultEURUSD.length && contt < valorVela; contt++){
+					var indexIguales = 1;
 					RowEURUSD = arrResultEURUSD[iEP];
-					RowEURUSD.sec = sec;
-					RowUSDCHF = arrResultUSDCHF[jEP];
-					RowUSDCHF.sec = sec;
-					/*RowEURUSD.tendencia = 'N';
-					RowUSDCHF.tendencia = 'N';*/
-					RowEURUSD.precio_bidEURUSD = RowEURUSD.precio_bid;
-					RowEURUSD.precio_bidUSDCHF = RowUSDCHF.precio_bid;
-					RowUSDCHF.precio_bidUSDCHF = RowUSDCHF.precio_bid;
-					RowEURUSD.spreadEURUSD = Math.floor((RowEURUSD.precio_ask - RowEURUSD.precio_bid) * 100000);//Math.floor(RowEURUSD.precio_ask - RowEURUSD.precio_bid) * 10000;				
-					RowEURUSD.spreadUSDCHF = Math.floor((RowUSDCHF.precio_ask - RowUSDCHF.precio_bid) * 100000);//Math.floor(RowUSDCHF.precio_ask - RowUSDCHF.precio_bid) *
-					RowUSDCHF.spreadUSDCHF = Math.floor((RowUSDCHF.precio_ask - RowUSDCHF.precio_bid) * 100000);//Math.floor(RowUSDCHF.precio_ask - RowUSDCHF.precio_bid) * 10000;
 					
-					//var arrPrueba = 
-					
-					RowEURUSD.movEURUSD = 0;
-					RowUSDCHF.movUSDCHF = 0;
-					RowEURUSD.movAcumEURUSD = 0;
-					RowUSDCHF.movAcumUSDCHF = 0;
-					console.log("*************************************************************************");
-					console.log("[" + sec + "]");
-					
-					//console.log(iEP);
-					
-					arrResultEURUSD[iEP]['sec'] = sec;
-					arrResultUSDCHF[jEP]['sec'] = sec;
-					fecha = arrResultEURUSD[iEP]['fecha'].split(' ')[1];
+					fecha = RowEURUSD['fecha'].split(' ')[1];
 					var minN = parseInt(fecha.split(':')[1]);
 					var segN = parseInt(fecha.split(':')[2]);
 					console.log(minEP + ":" + segEP + " | " + minN + ":" + segN);
-					if(minEP == minN && segEP == segN){
-						//console.log(arrResultEURUSD[iEP]);					
-						RowEURUSD = arrResultEURUSD[iEP];
-						RowEURUSD.divisa = "EURUSD";															
+					
+					var arrProc = [arrResultEURUSD[iEP]];
+					
+					
+					
+					
+					for(var cont = 0; cont < arrProc.length; cont++){
+						sec++;
+						RowEURUSD = arrProc[cont];
+						RowEURUSD.sec = sec;
+						/*RowEURUSD.tendencia = 'N';
+						RowUSDCHF.tendencia = 'N';*/
 						RowEURUSD.precio_bidEURUSD = RowEURUSD.precio_bid;
+						RowEURUSD.spreadEURUSD = Math.floor((RowEURUSD.precio_ask - RowEURUSD.precio_bid) * 100000);//Math.floor(RowEURUSD.precio_ask - RowEURUSD.precio_bid) * 10000;
 						
-						swEURUSD = true;
 						
-					} else {
-						console.log("TIEMPO REPETIDO");	
-						//console.log(arrResultEURUSD[iEP]);
+						//var arrPrueba = 
+						
 						RowEURUSD.movEURUSD = 0;
-						iEP--;				
-						swEURUSD = false;					
-					}
-					fecha = arrResultUSDCHF[jEP]['fecha'].split(' ')[1];
-					var minN = parseInt(fecha.split(':')[1]);
-					var segN = parseInt(fecha.split(':')[2]);
-					console.log(minEP + ":" + segEP + " | " + minN + ":" + segN);
-					if(minEP == minN && segEP == segN){
-									   
-						console.log("TIEMPO ENCONTRADO");
-						RowUSDCHF = arrResultUSDCHF[jEP];
-						RowUSDCHF.divisa = "USDCHF";
+						RowEURUSD.movAcumEURUSD = 0;
+						console.log("*************************************************************************");
+						console.log("EJECUCION " + (cont + 1));
+						console.log("[" + sec + "]");
 						
-						swUSDCHF = true;
+						console.log(iEP);
 						
-						
-					} else {
-						console.log("TIEMPO REPETIDO");	
-						console.log(arrResultUSDCHF[jEP]);
-						RowUSDCHF.movUSDCHF = 0;
-						jEP--;			
-						swUSDCHF = false;
-					}
-					RowEURUSD.fechaEURUSD = RowEURUSD.fecha.split(" ")[0] + ' ' + RowEURUSD.fecha.split(" ")[1].split(':')[0] + ":" + minEP + ":" + segEP;
-					RowUSDCHF.fechaUSDCHF = RowUSDCHF.fecha.split(" ")[0] + ' ' + RowUSDCHF.fecha.split(" ")[1].split(':')[0] + ":" + minEP + ":" + segEP;
-					if(segEP + 1 > 59){
-						segEP = 0;
-						if(minEP + 1 > 59){
-							minEP = 0;
+						//RowEURUSD['sec'] = sec;
+						if(minEP == minN && segEP == segN){
+							console.log(RowEURUSD);					
+							RowEURUSD = RowEURUSD;
+							RowEURUSD.divisa = "EURUSD";															
+							RowEURUSD.precio_bidEURUSD = RowEURUSD.precio_bid;
+							
+							swEURUSD = true;
+							
+							while(iEP + indexIguales < arrResultEURUSD.length){
+								console.log("[BUSCANDO REGISTRO NUEVO]");
+								console.log(arrResultEURUSD[iEP + indexIguales]);
+								fechaN = arrResultEURUSD[iEP + indexIguales]['fecha'].split(' ')[1];
+								
+								var minNN = parseInt(fechaN.split(':')[1]);
+								var segNN = parseInt(fechaN.split(':')[2]);
+								console.log(fechaN + " " + minNN + " " +segNN);
+								if(fecha == fechaN && minN == minNN && segN == segNN){
+									arrProc.push(arrResultEURUSD[iEP + (indexIguales++)]);
+									console.log("NUEVO REGISTRO\n");
+								} else {
+									break;
+								}
+								
+							}
+							iEP++;
 						} else {
-							minEP++;
+							console.log("TIEMPO REPETIDO");	
+							console.log(RowEURUSD);
+							RowEURUSD.movEURUSD = 0;
+											
+							swEURUSD = false;					
 						}
-					} else {
-						segEP++;
+						
+						RowEURUSD.fechaEURUSD = RowEURUSD.fecha.split(" ")[0] + ' ' + RowEURUSD.fecha.split(" ")[1].split(':')[0] + ":" + minEP + ":" + segEP;
+						if(cont == arrProc.length - 1){
+							console.log("SUMA SEGUNDO");
+							if(segEP + 1 > 59){
+								segEP = 0;
+								if(minEP + 1 > 59){
+									minEP = 0;
+								} else {
+									minEP++;
+								}
+							} else {
+								segEP++;
+							}
+						}
+						
+						//RowEURUSD.precio_bidUSDCHF = RowUSDCHF.precio_bid;
+						if(swEURUSD){
+							socket.write("RECEP|INIPIP|" + JSON.stringify(RowEURUSD) + "|" + sec + "|S|" + (cont == 0 ? "S" : "N") + "|" + arrOpt[2], 'utf8');
+							console.log("***  ENVIADO   ***");
+						} else {
+							socket.write("RECEP|INIPIP|" + JSON.stringify(RowEURUSD) + "|" + sec + "|N|S|" + arrOpt[2], 'utf8');
+							console.log("***  ENVIADO   ***");
+						}
 					}
-					RowEURUSD.precio_bidUSDCHF = RowUSDCHF.precio_bid;
-					//if(swUSDCHF || swEURUSD){
-						socket.write("RECEP|INIPIP|" + JSON.stringify(RowEURUSD) + "|" + JSON.stringify(RowUSDCHF) +  "|" + sec + "|" + arrOpt[2], 'utf8');
-					//}
-					
-					//console.log("Cant Orden: " + arrOrdAct.length);
 				}
 				
 				
@@ -724,9 +730,9 @@ function receiveData(socket, d) {
 			case "RESET":
 				fechaEP = fechaEP_RESET;
 				minEP = minEP_RESET;
-				segEP = segEP_RESET;
+				segEP = 0;//segEP_RESET;
 				iEP = 0;
-				sec = 1;
+				sec = 0;
 				jEP = 0;
 
 			break;

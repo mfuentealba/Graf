@@ -74,7 +74,7 @@ package servicios
 		
 		
 		public function generaPip(data:*, callback:Function):void{
-			connNode.envia('EP|' + /*modelApp.codPer*/10800 + '|', callback);
+			connNode.envia('EP|' + modelApp.codPer + '|', callback);
 		}
 		
 		public function generaPipRefresh(data:*, callback:Function):void{

@@ -107,7 +107,7 @@ package controlador
 		
 		public function fnRecalculaOrden(obj:*, index:int, array:Array):void{
 			if(obj['divisa'] == 'EURUSD'){
-				 
+				
 				if(obj.estado != 'Cerrado'){
 					modelApp.totalOperaciones = (Number(modelApp.totalOperaciones) - Number(obj['ganancia'])) + '';
 					obj['ganancia'] += movEURUSD['mov'] * (obj['tipo'] == 'C' ? 1 : -1);
@@ -132,7 +132,7 @@ package controlador
 				}
 				
 			}
-			  
+			
 		}
 		
 		private var movEURUSD:Object;
@@ -148,9 +148,9 @@ package controlador
 					modelApp.txtSec = arrParam[4];
 					obj["movAcumUSDCHF"] = obj2['movAcumUSDCHF'];
 					/*if(modelApp.arrDataGraf.length > 500){
-						//modelApp.arrDataGraf = new ArrayCollection();
-						modelApp.arrDataGraf.source.splice(0, 1);
-						
+					//modelApp.arrDataGraf = new ArrayCollection();
+					modelApp.arrDataGraf.source.splice(0, 1);
+					
 					}*/
 					modelApp.arrDataGraf.addItem(obj);
 					movEURUSD = {};
@@ -184,7 +184,7 @@ package controlador
 					
 					
 					
-					if(modelApp.arrDataGrafVelas.length > 180){
+					if(modelApp.arrDataGrafVelas.length > 360){
 						//modelApp.arrDataGraf = new ArrayCollection();
 						
 						modelApp.arrDataGrafVelas.source.splice(0, 1);
@@ -217,7 +217,7 @@ package controlador
 						obj2 = modelApp.arrDataGrafPR.getItemAt(index);
 						
 					}
-					 
+					
 					for(var str:String in obj){
 						obj2[str] = obj[str]; 
 					}					
@@ -329,7 +329,7 @@ package controlador
 		}
 		
 		public var vela:Object;
-		public function fnInicial(obj:Object, obj2:Object):void{
+		public function fnInicial(obj:Object, opt:String, serie:String):void{
 			obj["movAcumUSDCHF"] = 0;
 			obj["movAcumEURUSD"] = 0;
 			obj["tendenciaEURUSD"] = 'N';
@@ -337,8 +337,8 @@ package controlador
 			
 			vela = {Open: 0,  High: 0, Low: 0, Close:0};
 			modelApp.arrDataGrafVelas.addItem(vela);
-			vela = {Open: 0,  High: 0, Low: 0, Close:0};
-			modelApp.arrDataGrafVelas.addItem(vela);
+			/*vela = {Open: 0,  High: 0, Low: 0, Close:0};
+			modelApp.arrDataGrafVelas.addItem(vela);*/
 			modelApp.arrDataGraf.addItem(obj);
 			
 			
@@ -361,7 +361,7 @@ package controlador
 			} else {
 				obj['tendenciaEURUSD'] = modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]["tendenciaEURUSD"];
 			}
-	
+			
 			
 			movEURUSD = {};
 			movUSDCHF = {};
@@ -387,11 +387,13 @@ package controlador
 					if(vela['Open'] > vela['Close'] && velaAnterior['Open'] < velaAnterior['Close']){
 						var nivel:int = vela['High'] <= velaAnterior['High'] ? velaAnterior['High'] : vela['High'];
 						if(modelApp.objDataNiveles.hasOwnProperty('EURUSD|' + nivel)){
-							item = modelApp.arrDataNiveles.source[modelApp.objDataNiveles['EURUSD|' + nivel]];
+							var i:int = modelApp.arrDataNiveles.getItemIndex(modelApp.objDataNiveles['EURUSD|' + nivel]);
+							item = modelApp.arrDataNiveles.getItemAt(i);
 							item.mov = 'Resistencia';
 							item.cant++;						
 							var dist:int = modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'] - item.arrSec[item.arrSec.length - 1]['sec']; 
 							item.arrSec.addItem({sec: modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'], dist: dist, vela: modelApp.arrDataGrafVelas.length - 1, accion: 'resistencia'});
+							modelApp.arrDataNiveles.setItemAt(item, i);
 						} else {
 							item = {};			
 							item.movIni = 'EURUSD|' + nivel;
@@ -399,17 +401,19 @@ package controlador
 							item.mov = 'Resistencia';
 							item.cant = 1;
 							item.arrSec = new ArrayCollection([{sec: modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'], dist: 0, vela: modelApp.arrDataGrafVelas.length - 1, accion: 'resistencia'}]);
-							var i:int = modelApp.arrDataNiveles.source.push(item);
-							modelApp.objDataNiveles[item.movIni] = i - 1;
+							modelApp.arrDataNiveles.addItem(item);
+							modelApp.objDataNiveles[item.movIni] = item;
 						}
 					} else if(vela['Open'] < vela['Close'] && velaAnterior['Open'] > velaAnterior['Close']){
 						nivel = vela['Low'] <= velaAnterior['Low'] ? vela['Low'] : velaAnterior['Low'];  
 						if(modelApp.objDataNiveles.hasOwnProperty('EURUSD|' + nivel)){
-							item = modelApp.arrDataNiveles.source[modelApp.objDataNiveles['EURUSD|' + nivel]];
+							i = modelApp.arrDataNiveles.getItemIndex(modelApp.objDataNiveles['EURUSD|' + nivel]);
+							item = modelApp.arrDataNiveles.getItemAt(i);
 							item.mov = 'Soporte';
 							item.cant++;						
 							dist = modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'] - item.arrSec[item.arrSec.length - 1]['sec']; 
 							item.arrSec.addItem({sec: modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'], dist: dist, vela: modelApp.arrDataGrafVelas.length - 1, accion: 'soporte'});
+							modelApp.arrDataNiveles.setItemAt(item, i);
 						} else {
 							item = {};			
 							item.movIni = 'EURUSD|' + nivel;
@@ -417,13 +421,13 @@ package controlador
 							item.mov = 'Soporte';
 							item.cant = 1;
 							item.arrSec = new ArrayCollection([{sec: modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'], dist: 0, vela: modelApp.arrDataGrafVelas.length - 1, accion: 'soporte'}]);
-							i = modelApp.arrDataNiveles.source.push(item);
-							modelApp.objDataNiveles[item.movIni] = i - 1;
+							modelApp.arrDataNiveles.addItem(item);
+							modelApp.objDataNiveles[item.movIni] = item;
 						}
 					}
 					
 					
-					modelApp.arrDataNiveles.refresh();
+					//modelApp.arrDataNiveles.refresh();
 					
 					
 					/**************************************************************************/
@@ -432,19 +436,24 @@ package controlador
 					
 					vela = {Open: obj["movAcumEURUSD"],  High: obj["movAcumEURUSD"], Low: obj["movAcumEURUSD"], Close:obj["movAcumEURUSD"]};
 					modelApp.arrDataGrafVelas.addItem(vela);	
-				} else {
+				} else {/*
+					SE CREA VELA NUEVA QUE EN EL MOMENTO EN QUE LLEGA UN NUEVO MOVIMIENTO SE REINICIARA PARA QUE ESE MOVIMIENTO SE TOME COMO EL PRIMER TIC Y NO EL CIERRE ANTERIOR; 
+					SI LLEGASE A NO HABER MOV EN ESTA VELA ENTONCES SE DEJA COMO ESPACIO Y TENDRIA UNA VELA SIN MOVIMIENNTOS
+					*/
+					vela = {Open: obj["movAcumEURUSD"],  High: obj["movAcumEURUSD"], Low: obj["movAcumEURUSD"], Close:obj["movAcumEURUSD"]};
+					modelApp.arrDataGrafVelas.addItem(vela);	
 					vela = null;
 				}
 				
 			} else {
-				if(serie == 'N'){
+				if(serie == 'S'){/************SI HAY MAS DE UN PIP EN EL MISMO SEGUNDO NO SUMO***********************/
 					modelApp.codPerIn++;	
 				}
 				
-				if(opt == 'S'){
+				if(opt == 'S'){/************ACTUALIZO VELA***********************/
 					if(vela == null){
 						vela = {Open: obj["movAcumEURUSD"],  High: obj["movAcumEURUSD"], Low: obj["movAcumEURUSD"], Close:obj["movAcumEURUSD"]};
-						modelApp.arrDataGrafVelas.addItem(vela);
+						modelApp.arrDataGrafVelas.setItemAt(vela, modelApp.arrDataGrafVelas.length - 1);
 					} else {
 						vela = modelApp.arrDataGrafVelas.source[modelApp.arrDataGrafVelas.length - 1];	
 					}
@@ -455,14 +464,15 @@ package controlador
 					} else if(obj["movAcumEURUSD"] < vela['Low']){
 						vela['Low'] = obj["movAcumEURUSD"];
 					}
-					//trace(vela);	
+					//trace(vela);
+					modelApp.arrDataGrafVelas.setItemAt(vela, modelApp.arrDataGrafVelas.length - 1); 
 				}
 				
 			}
 			
-			modelApp.arrDataGraf.source.push(obj);
-			modelApp.arrDataGraf.refresh();
-			modelApp.arrDataGrafVelas.refresh();
+			modelApp.arrDataGraf.addItem(obj);
+			//modelApp.arrDataGraf.refresh();
+			//modelApp.arrDataGrafVelas.refresh();
 			
 		}
 		
