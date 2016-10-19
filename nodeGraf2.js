@@ -171,7 +171,7 @@ function receiveData(socket, d) {
 		socket.arrOpt = arrOpt;
 		//arrSocket
 		//console.log("********************************************************************");
-		//console.log("From Flash = " + d);
+		console.log("From Flash = " + d);
 		
 		var arrOpt = opt.split('|');
 		
@@ -529,7 +529,7 @@ function receiveData(socket, d) {
 				});
 			break;
 			case "EP2"://Envia PIP
-				sec++;
+				
 				var indexIguales = 1;
 				RowEURUSD = arrResultEURUSD[iEP];
 				
@@ -539,23 +539,12 @@ function receiveData(socket, d) {
 				console.log(minEP + ":" + segEP + " | " + minN + ":" + segN);
 				
 				var arrProc = [arrResultEURUSD[iEP]];
-				while(iEP + indexIguales < arrResultEURUSD.length){
-					fechaN = arrResultEURUSD[iEP + indexIguales]['fecha'].split(' ')[1];
-					var minNN = parseInt(fechaN.split(':')[1]);
-					var segNN = parseInt(fechaN.split(':')[2]);
 				
-					if(fecha == fechaN && minN == minNN && segN == segNN){
-						arrProc.push(arrResultEURUSD[iEP + indexIguales]);
-						
-					} else {
-						break;
-					}
-					
-				}
 				
 				
 				
 				for(var cont = 0; cont < arrProc.length; cont++){
+					sec++;
 					RowEURUSD = arrProc[cont];
 					RowEURUSD.sec = sec;
 					/*RowEURUSD.tendencia = 'N';
@@ -569,11 +558,12 @@ function receiveData(socket, d) {
 					RowEURUSD.movEURUSD = 0;
 					RowEURUSD.movAcumEURUSD = 0;
 					console.log("*************************************************************************");
+					console.log("EJECUCION " + (cont + 1));
 					console.log("[" + sec + "]");
 					
 					console.log(iEP);
 					
-					RowEURUSD['sec'] = sec;
+					//RowEURUSD['sec'] = sec;
 					if(minEP == minN && segEP == segN){
 						console.log(RowEURUSD);					
 						RowEURUSD = RowEURUSD;
@@ -581,6 +571,23 @@ function receiveData(socket, d) {
 						RowEURUSD.precio_bidEURUSD = RowEURUSD.precio_bid;
 						
 						swEURUSD = true;
+						
+						while(iEP + indexIguales < arrResultEURUSD.length){
+							console.log("[BUSCANDO REGISTRO NUEVO]");
+							console.log(arrResultEURUSD[iEP + indexIguales]);
+							fechaN = arrResultEURUSD[iEP + indexIguales]['fecha'].split(' ')[1];
+							
+							var minNN = parseInt(fechaN.split(':')[1]);
+							var segNN = parseInt(fechaN.split(':')[2]);
+							console.log(fechaN + " " + minNN + " " +segNN);
+							if(fecha == fechaN && minN == minNN && segN == segNN){
+								arrProc.push(arrResultEURUSD[iEP + (indexIguales++)]);
+								console.log("NUEVO REGISTRO\n");
+							} else {
+								break;
+							}
+							
+						}
 						iEP++;
 					} else {
 						console.log("TIEMPO REPETIDO");	
@@ -591,20 +598,23 @@ function receiveData(socket, d) {
 					}
 					
 					RowEURUSD.fechaEURUSD = RowEURUSD.fecha.split(" ")[0] + ' ' + RowEURUSD.fecha.split(" ")[1].split(':')[0] + ":" + minEP + ":" + segEP;
-					
-					if(segEP + 1 > 59){
-						segEP = 0;
-						if(minEP + 1 > 59){
-							minEP = 0;
+					if(cont == arrProc.length - 1){
+						console.log("SUMA SEGUNDO");
+						if(segEP + 1 > 59){
+							segEP = 0;
+							if(minEP + 1 > 59){
+								minEP = 0;
+							} else {
+								minEP++;
+							}
 						} else {
-							minEP++;
+							segEP++;
 						}
-					} else {
-						segEP++;
 					}
+					
 					//RowEURUSD.precio_bidUSDCHF = RowUSDCHF.precio_bid;
 					if(swEURUSD){
-						socket.write("RECEP|INIPIP|" + JSON.stringify(RowEURUSD) + "|" + sec + "|S|" + arrOpt[1], 'utf8');
+						socket.write("RECEP|INIPIP|" + JSON.stringify(RowEURUSD) + "|" + sec + "|S|" + (arrProc.length > 1 ? "S" : "N") + arrOpt[1], 'utf8');
 					} else {
 						socket.write("RECEP|INIPIP|" + JSON.stringify(RowEURUSD) + "|" + sec + "|N|" + arrOpt[1], 'utf8');
 					}

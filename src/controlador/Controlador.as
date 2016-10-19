@@ -190,7 +190,7 @@ package controlador
 						modelApp.arrDataGrafVelas.source.splice(0, 1);
 						
 					}
-					fnProc.call(this, obj, arrParam[4]);
+					fnProc.call(this, obj, arrParam[4], arrParam[5]);
 					modelApp.arrDataGrafOrdExec.source.forEach(fnRecalculaOrden);
 					modelApp.arrDataGrafOrdExec.refresh();
 					
@@ -346,7 +346,7 @@ package controlador
 			//modelApp.codPerIn++;
 		}
 		
-		private function fnSec(obj:Object, opt:String):void{
+		private function fnSec(obj:Object, opt:String, serie:String):void{
 			
 			obj["movAcumEURUSD"] = int((obj["precio_bidEURUSD"] - modelApp.arrDataGraf.source[0]["precio_bidEURUSD"]) * 100000);
 			//obj["movAcumUSDCHF"] = int((obj2["precio_bidUSDCHF"] - modelApp.arrDataGraf.source[0]["precio_bidUSDCHF"]) * 100000);
@@ -437,7 +437,10 @@ package controlador
 				}
 				
 			} else {
-				modelApp.codPerIn++;
+				if(serie == 'N'){
+					modelApp.codPerIn++;	
+				}
+				
 				if(opt == 'S'){
 					if(vela == null){
 						vela = {Open: obj["movAcumEURUSD"],  High: obj["movAcumEURUSD"], Low: obj["movAcumEURUSD"], Close:obj["movAcumEURUSD"]};
