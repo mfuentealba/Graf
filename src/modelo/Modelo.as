@@ -21,6 +21,17 @@ package modelo
 		public var menorOperaciones:String = '0';
 		public var conexion:ConexionSocket = new ConexionSocket();
 		public var arrDataGraf:ArrayCollection = new ArrayCollection();
+		
+		public var arrMinimos:ArrayCollection = new ArrayCollection();
+		public var arrMaximos:ArrayCollection = new ArrayCollection();
+		
+		public var proyeccionAlcistaBL:Boolean;
+		public var proyeccionAlcista:Number;
+		public var corteMinAlcista:Number;
+		
+		
+		
+		
 		public var arrDataGrafVelas:ArrayCollection = new ArrayCollection();
 		public var codPer:int = 60;
 		public var codPerIn:int = 0;

@@ -130,6 +130,8 @@
 				modelApp.arrDataGraf = new ArrayCollection();
 				//modelApp.arrDataGraf.addItem(obj);
 				modelApp.totalOperaciones = '0';
+				modelApp.arrMinimos = new ArrayCollection();
+				modelApp.arrMaximos = new ArrayCollection();
 				modelApp.arrDataGrafOrd = new ArrayCollection();
 				modelApp.arrDataGrafOrdExec = new ArrayCollection();
 				modelApp.arrDataNiveles = new ArrayCollection();
