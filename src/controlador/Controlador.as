@@ -140,7 +140,10 @@ package controlador
 			if(obj['divisa'] == 'EURUSD'){
 				
 				if(obj.estado != 'Cerrado'){
-					obj.estado = 'Cerrado';					
+					obj.estado = 'Cerrado';	
+					modelApp.proyeccionAlcistaBL = false;
+					modelApp.proyeccionBajistaBL = false;
+					
 				}
 				
 			} else if(obj['divisa'] == 'USDCHF'){
@@ -409,6 +412,15 @@ package controlador
 				}
 				
 				
+				if(modelApp.proyeccionBajistaBL){
+					if(vela['Low'] > modelApp.proyeccionBajista * (modelApp.arrDataGrafVelas.length - 1) + modelApp.corteMinBajista){
+						//cerrar Orden
+						trace("Cerrar Orden");
+						modelApp.arrDataGrafOrdExec.source.forEach(fnRecalculaOrden2);
+					}
+				}
+				
+				
 				
 				
 				if(velaAnterior['Open'] < velaAnterior['Close'] && vela['Open'] > vela['Close']){//verde-roja
@@ -436,14 +448,43 @@ package controlador
 					}*/
 					objNuevo = {num: vela['High'] > velaAnterior['High'] ? modelApp.arrDataGrafVelas.length - 1 : modelApp.arrDataGrafVelas.length - 2,  valor: vela['High'] > velaAnterior['High'] ? vela['High'] : velaAnterior['High']};
 					if(modelApp.arrMaximos.length > 0){
-						if(objNuevo['valor'] < modelApp.arrMaximos.getItemAt(modelApp.arrMaximos.length - 1)['valor']){
+						valorAnterior = modelApp.arrMaximos.getItemAt(modelApp.arrMaximos.length - 1);
+						if(objNuevo['valor'] < valorAnterior['valor']){
 							modelApp.arrMaximos.addItem(objNuevo);
+							//Crea orden y saca proyeccion segun pendiente
+							if(!modelApp.proyeccionBajistaBL){
+								modelApp.proyeccionBajistaBL = true;
+								modelApp.proyeccionBajista = (valorAnterior['valor'] - objNuevo['valor']) / (valorAnterior['num'] - objNuevo['num']);
+								modelApp.corteMinBajista = objNuevo['valor'] - objNuevo['num'] * modelApp.proyeccionBajista;
+								
+								obj = modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1];
+								item2 = {};
+								
+								item2 = {};
+								item2.fecha = obj.fechaTrans;
+								item2.ganancia = -obj.spreadEURUSD;
+								item2.sl = -100;
+								item2.tp = 500;
+								item2.spread = -obj.spreadEURUSD;
+								item2.pip = 0;
+								item2.num = 'EURUSD|' + obj['id']; 
+								item2.divisa = 'EURUSD';
+								item2.tipo = 'V';
+								item2.movIni = obj["movAcumEURUSD"];
+								item2.estado = "Abierta";
+								modelApp.totalOperaciones = (int(modelApp.totalOperaciones) + item2.ganancia) + '';
+								i = modelApp.arrDataGrafOrdExec.source.push(item2);
+								modelApp.objDataGrafOrdExec[item2.num] = i - 1;
+								modelApp.arrDataGrafOrdExec.refresh();
+							}
 						} else {
 							modelApp.arrMaximos.setItemAt(objNuevo, modelApp.arrMaximos.length - 1);
 						}
 					} else {
 						modelApp.arrMaximos.addItem(objNuevo);	
 					}
+					
+									
 					
 				} else if(vela['Open'] < vela['Close'] && velaAnterior['Open'] > velaAnterior['Close']){//roja-verde
 					nivel = vela['Low'] <= velaAnterior['Low'] ? vela['Low'] : velaAnterior['Low'];  

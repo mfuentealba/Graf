@@ -29,6 +29,9 @@ package modelo
 		public var proyeccionAlcista:Number;
 		public var corteMinAlcista:Number;
 		
+		public var proyeccionBajistaBL:Boolean;
+		public var proyeccionBajista:Number;
+		public var corteMinBajista:Number;
 		
 		
 		
