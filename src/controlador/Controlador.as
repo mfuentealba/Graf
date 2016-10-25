@@ -3,6 +3,8 @@ package controlador
 	
 	import com.adobe.serialization.json.JSON;
 	
+	import componentes.clases.Callback;
+	
 	import eventos.DataTranferidaEvent;
 	import eventos.GeneraDataEvent;
 	
@@ -136,10 +138,10 @@ package controlador
 		}
 		
 		
-		public function fnRecalculaOrden2(obj:*, index:int, array:Array):void{
+		public function fnRecalculaOrden2(obj:*, index:int, array:Array, opt:String):void{
 			if(obj['divisa'] == 'EURUSD'){
 				
-				if(obj.estado != 'Cerrado'){
+				if(obj.estado != 'Cerrado' && opt == obj['tipo']){
 					obj.estado = 'Cerrado';	
 					modelApp.proyeccionAlcistaBL = false;
 					modelApp.proyeccionBajistaBL = false;
@@ -404,19 +406,21 @@ package controlador
 				
 				
 				if(modelApp.proyeccionAlcistaBL){
-					if(vela['Low'] < modelApp.proyeccionAlcista * (modelApp.arrDataGrafVelas.length - 1) + modelApp.corteMinAlcista){
+					if(vela['Low'] + 10 < modelApp.proyeccionAlcista * (modelApp.arrDataGrafVelas.length - 1) + modelApp.corteMinAlcista && vela['arrMov'].length > 0){
 						//cerrar Orden
 						trace("Cerrar Orden");
-						modelApp.arrDataGrafOrdExec.source.forEach(fnRecalculaOrden2);
+						modelApp.arrDataGrafOrdExec.source.forEach(Callback.create(fnRecalculaOrden2, 'C'));
+						modelApp.proyeccionAlcistaBL = false;
 					}
 				}
 				
 				
 				if(modelApp.proyeccionBajistaBL){
-					if(vela['Low'] > modelApp.proyeccionBajista * (modelApp.arrDataGrafVelas.length - 1) + modelApp.corteMinBajista){
+					if(vela['High'] - 10 > modelApp.proyeccionBajista * (modelApp.arrDataGrafVelas.length - 1) + modelApp.corteMinBajista && vela['arrMov'].length > 0){
 						//cerrar Orden
 						trace("Cerrar Orden");
-						modelApp.arrDataGrafOrdExec.source.forEach(fnRecalculaOrden2);
+						modelApp.arrDataGrafOrdExec.source.forEach(Callback.create(fnRecalculaOrden2, 'V'));
+						modelApp.proyeccionBajistaBL = false;
 					}
 				}
 				
@@ -452,9 +456,11 @@ package controlador
 						if(objNuevo['valor'] < valorAnterior['valor']){
 							modelApp.arrMaximos.addItem(objNuevo);
 							//Crea orden y saca proyeccion segun pendiente
-							if(!modelApp.proyeccionBajistaBL){
+							aux = modelApp.proyeccionBajista;
+							modelApp.proyeccionBajista = (valorAnterior['valor'] - objNuevo['valor']) / (valorAnterior['num'] - objNuevo['num']);
+							if(!modelApp.proyeccionBajistaBL && modelApp.proyeccionBajista < -2){
 								modelApp.proyeccionBajistaBL = true;
-								modelApp.proyeccionBajista = (valorAnterior['valor'] - objNuevo['valor']) / (valorAnterior['num'] - objNuevo['num']);
+								
 								modelApp.corteMinBajista = objNuevo['valor'] - objNuevo['num'] * modelApp.proyeccionBajista;
 								
 								obj = modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1];
@@ -476,6 +482,8 @@ package controlador
 								i = modelApp.arrDataGrafOrdExec.source.push(item2);
 								modelApp.objDataGrafOrdExec[item2.num] = i - 1;
 								modelApp.arrDataGrafOrdExec.refresh();
+							} else {
+								modelApp.proyeccionBajista = aux;
 							}
 						} else {
 							modelApp.arrMaximos.setItemAt(objNuevo, modelApp.arrMaximos.length - 1);
@@ -513,11 +521,14 @@ package controlador
 					if(modelApp.arrMinimos.length > 0){
 						var valorAnterior:Object = modelApp.arrMinimos.getItemAt(modelApp.arrMinimos.length - 1);
 						if(objNuevo['valor'] > valorAnterior['valor']){
+							
 							modelApp.arrMinimos.addItem(objNuevo);
 							//Crea orden y saca proyeccion segun pendiente
-							if(!modelApp.proyeccionAlcistaBL){
+							var aux:Number = modelApp.proyeccionAlcista;
+							modelApp.proyeccionAlcista = (valorAnterior['valor'] - objNuevo['valor']) / (valorAnterior['num'] - objNuevo['num']);
+							if(!modelApp.proyeccionAlcistaBL && modelApp.proyeccionAlcista > 2){
 								modelApp.proyeccionAlcistaBL = true;
-								modelApp.proyeccionAlcista = (valorAnterior['valor'] - objNuevo['valor']) / (valorAnterior['num'] - objNuevo['num']);
+								
 								modelApp.corteMinAlcista = objNuevo['valor'] - objNuevo['num'] * modelApp.proyeccionAlcista;
 								
 								var obj:Object = modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1];
@@ -526,8 +537,8 @@ package controlador
 								item2 = {};
 								item2.fecha = obj.fechaTrans;
 								item2.ganancia = -obj.spreadEURUSD;
-								item2.sl = -50;
-								item2.tp = 250;
+								item2.sl = -100;
+								item2.tp = 500;
 								item2.spread = -obj.spreadEURUSD;
 								item2.pip = 0;
 								item2.num = 'EURUSD|' + obj['id']; 
@@ -542,6 +553,8 @@ package controlador
 								
 								
 								
+							} else {
+								modelApp.proyeccionAlcista = aux;	
 							}
 							
 								 
