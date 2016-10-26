@@ -2,6 +2,7 @@ package modelo
 {
 	import componentes.clases.ConexionSocket;
 	
+	import flash.sampler.NewObjectSample;
 	import flash.utils.Timer;
 	
 	import mx.collections.ArrayCollection;
@@ -32,6 +33,8 @@ package modelo
 		public var proyeccionBajistaBL:Boolean;
 		public var proyeccionBajista:Number;
 		public var corteMinBajista:Number;
+		
+		public var arrTendencias:ArrayCollection = new ArrayCollection();
 		
 		
 		
