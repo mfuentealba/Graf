@@ -25,6 +25,7 @@ package modelo
 		public var arrDataGraf:ArrayCollection = new ArrayCollection();
 		
 		public var arrMinimos:ArrayCollection = new ArrayCollection();
+		public var arrMinimosExcluidos:ArrayCollection = new ArrayCollection();
 		public var arrMaximos:ArrayCollection = new ArrayCollection();
 		
 		public var proyeccionAlcistaBL:Boolean;

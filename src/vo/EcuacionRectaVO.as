@@ -6,6 +6,7 @@ package vo
 	{
 		public var pendiente:Number;
 		public var coefCorte:Number;
+		public var id:String;
 		public var arrPtos:ArrayCollection = new ArrayCollection();
 		public function EcuacionRectaVO()
 		{

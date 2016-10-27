@@ -17,6 +17,7 @@
 			
 			import modelo.Modelo;
 			
+			import mx.charts.series.CandlestickSeries;
 			import mx.collections.ArrayCollection;
 			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
@@ -279,6 +280,20 @@
 			{
 				// TODO Auto-generated method stub
 				modelApp.grVelas = grVelas; 
+				
+				
+				//modelApp.grVelas.series
+					
+				var c:CandlestickSeries = new CandlestickSeries();
+				c.openField = "Open"; 
+				c.highField = "High";
+				c.lowField = "Low";
+				c.closeField = "Close";
+				c.setStyle('fill', up);
+				c.setStyle('declineFill', down);
+				c.setStyle('stroke', wick);
+				c.setStyle('boxStroke', box);
+				modelApp.grVelas.series = [c];
 			}
 			
 		]]>
@@ -342,17 +357,8 @@
 						</mx:horizontalAxisRenderers>-->
 						
 						<mx:series>
-							<mx:CandlestickSeries 
-								openField="Open" 
-								highField="High" 
-								lowField="Low" 
-								closeField="Close"
-								fill="{up}"
-								declineFill="{down}"
-								stroke="{wick}"
-								boxStroke="{box}"
-								/>
-							<!--<mx:LineSeries displayName="CIERRES" form="curve" yField="Nivel"/>-->
+							
+							<!--<mx:LineSeries displayName="Close" form="curve" yField="Close"/>-->
 						</mx:series>
 					</mx:CandlestickChart>
 					<mx:Legend dataProvider="{grVelas}"/>
@@ -369,7 +375,7 @@
 										alpha=".6"/>
 								</mx:lineStroke>     
 							</mx:LineSeries>
-							<mx:LineSeries displayName="USDCHF" form="curve" yField="movAcumUSDCHF"/>
+							<!--<mx:LineSeries displayName="USDCHF" form="curve" yField="movAcumUSDCHF"/>-->
 						</mx:series>
 					</mx:LineChart>
 					<s:DataGrid id="dgNiveles" selectionMode="multipleRows" selectionChange="dgNiveles_selectionChangeHandler(event)" x="483" y="10" width="30%" requestedRowCount="4" dataProvider="{modelApp.arrDataNiveles}" height="100%">
