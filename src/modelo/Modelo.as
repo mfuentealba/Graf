@@ -5,6 +5,7 @@ package modelo
 	import flash.sampler.NewObjectSample;
 	import flash.utils.Timer;
 	
+	import mx.charts.CandlestickChart;
 	import mx.collections.ArrayCollection;
 	
 	import spark.components.Application;
@@ -34,6 +35,8 @@ package modelo
 		public var proyeccionBajista:Number;
 		public var corteMinBajista:Number;
 		
+		
+		public var grVelas:CandlestickChart;
 		public var arrTendencias:ArrayCollection = new ArrayCollection();
 		
 		

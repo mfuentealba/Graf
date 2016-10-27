@@ -275,6 +275,12 @@
 				
 			}
 			
+			protected function grVelas_creationCompleteHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				modelApp.grVelas = grVelas; 
+			}
+			
 		]]>
 	</fx:Script>
 	<!--<fx:Binding source="{dgNiveles.selectedItems}" destination="fnNivel"/>-->
@@ -321,7 +327,8 @@
 										 paddingRight="5" 
 										 paddingLeft="5" 
 										 showDataTips="true"
-										 dataProvider="{modelApp.arrDataGrafVelas}">
+										 dataProvider="{modelApp.arrDataGrafVelas}"
+										 creationComplete="grVelas_creationCompleteHandler(event)">
 						<mx:verticalAxis>
 							<mx:LinearAxis id="vaxis" baseAtZero="false" title="Price"/>
 						</mx:verticalAxis>

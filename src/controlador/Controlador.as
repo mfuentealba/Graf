@@ -17,6 +17,7 @@ package controlador
 	import modelo.Modelo;
 	
 	import mx.charts.chartClasses.DataTransform;
+	import mx.charts.series.LineSeries;
 	import mx.collections.ArrayCollection;
 	import mx.managers.PopUpManager;
 	import mx.rpc.Responder;
@@ -536,7 +537,7 @@ package controlador
 							//Crea orden y saca proyeccion segun pendiente
 							if(modelApp.arrMinimos.length > 2){
 								var valorInicial:Object = modelApp.arrMinimos.getItemAt(modelApp.arrMinimos.length - 3);
-								var aux:Number = modelApp.proyeccionAlcista;
+								aux = modelApp.proyeccionAlcista;
 								modelApp.proyeccionAlcista = (valorInicial['valor'] - valorAnterior['valor']) / (valorInicial['num'] - valorAnterior['num']);
 								modelApp.corteMinAlcista = valorAnterior['valor'] - valorAnterior['num'] * modelApp.proyeccionAlcista;
 								if(objNuevo['valor'] >= modelApp.proyeccionAlcista * objNuevo['num'] + modelApp.corteMinAlcista && objNuevo['valor'] - 10 <= modelApp.proyeccionAlcista * objNuevo['num'] + modelApp.corteMinAlcista){
@@ -547,6 +548,8 @@ package controlador
 									modelApp.arrMinimos.removeItemAt(modelApp.arrMinimos.getItemIndex(valorAnterior));
 									modelApp.arrMinimos.removeItemAt(modelApp.arrMinimos.getItemIndex(objNuevo));
 									modelApp.arrTendencias.addItem(linea);
+									var serieLinea:LineSeries = new LineSeries();
+									
 									if(!modelApp.proyeccionAlcistaBL && modelApp.proyeccionAlcista > 2){
 										
 										modelApp.proyeccionAlcistaBL = true;
