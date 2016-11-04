@@ -331,6 +331,7 @@
 					<s:Button label="Compra" click="fnGeneraOrdenManual(event)"/>
 					<s:Button label="Venta" click="fnGeneraOrdenManual(event)"/>
 					<s:Label text="{modelApp.txtSec}"/>
+					<s:Label text="{modelApp.contVela}"/>
 					<s:Button label="LimpiarNiveles" click="fnLimpiarNivel(event)" enabled="{dgNiveles.selectedItem}"/>
 					<s:Button label="Muestra Puntos" click="fnMuestraPtos(event)" enabled="{dgNiveles.selectedItem}"/>
 				</s:HGroup>

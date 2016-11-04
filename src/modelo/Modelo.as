@@ -23,6 +23,8 @@ package modelo
 		public var menorOperaciones:String = '0';
 		public var conexion:ConexionSocket = new ConexionSocket();
 		public var arrDataGraf:ArrayCollection = new ArrayCollection();
+		public var contVela:int;
+		public var objMin:Object = {};
 		
 		public var arrMinimos:ArrayCollection = new ArrayCollection();
 		public var arrMinimosExcluidos:ArrayCollection = new ArrayCollection();
