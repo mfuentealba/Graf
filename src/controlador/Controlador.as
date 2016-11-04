@@ -409,9 +409,7 @@ package controlador
 				
 				
 				
-				for each(var ec:EcuacionRectaVO in modelApp.arrTendencias){
-					vela[ec.id] = vela['CLose'] * ec.pendiente + ec.coefCorte;
-				}
+				
 				
 				
 				
@@ -559,13 +557,14 @@ package controlador
 											var linea:EcuacionRectaVO = new EcuacionRectaVO();
 											linea.pendiente = modelApp.proyeccionAlcista;
 											linea.coefCorte = modelApp.corteMinAlcista;
-											linea.id = serieLinea.yField;
+											
 											/*arrMin.removeItemAt(arrMin.getItemIndex(valorInicial));
 											arrMin.removeItemAt(arrMin.getItemIndex(valorAnterior));
 											arrMin.removeItemAt(arrMin.getItemIndex(objNuevo));*/
 											modelApp.arrTendencias.addItem(linea);
 											var serieLinea:LineSeries = new LineSeries();
 											serieLinea.yField = 'Tendencia_' + modelApp.arrTendencias.length;
+											linea.id = serieLinea.yField;
 											var arrTraspaso:Array = modelApp.grVelas.series;
 											modelApp.grVelas.series = null;
 											arrTraspaso.push(serieLinea);
@@ -654,7 +653,7 @@ package controlador
 				}
 				if(opt == 'S'){
 					vela = {Open: obj["movAcumEURUSD"],  High: obj["movAcumEURUSD"], Low: obj["movAcumEURUSD"], Close:obj["movAcumEURUSD"], arrMov: [obj["movAcumEURUSD"]]};
-					modelApp.arrDataGrafVelas.addItem(vela);	
+					modelApp.arrDataGrafVelas.addItem(vela);		
 				} else {/*
 					SE CREA VELA NUEVA QUE EN EL MOMENTO EN QUE LLEGA UN NUEVO MOVIMIENTO SE REINICIARA PARA QUE ESE MOVIMIENTO SE TOME COMO EL PRIMER TIC Y NO EL CIERRE ANTERIOR; 
 					SI LLEGASE A NO HABER MOV EN ESTA VELA ENTONCES SE DEJA COMO ESPACIO Y TENDRIA UNA VELA SIN MOVIMIENNTOS
@@ -663,6 +662,9 @@ package controlador
 					vela = {Open: vela["Close"],  High: vela["Close"], Low: vela["Close"], Close: vela["Close"], arrMov: []};
 					modelApp.arrDataGrafVelas.addItem(vela);	
 					vela = null;
+				}
+				for each(var ec:EcuacionRectaVO in modelApp.arrTendencias){
+					modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 1)[ec.id] = (modelApp.arrDataGrafVelas.length - 1) * ec.pendiente + ec.coefCorte;
 				}
 				
 			} else {
@@ -673,6 +675,9 @@ package controlador
 				if(opt == 'S'){/************ACTUALIZO VELA***********************/
 					if(vela == null){
 						vela = {Open: obj["movAcumEURUSD"],  High: obj["movAcumEURUSD"], Low: obj["movAcumEURUSD"], Close:obj["movAcumEURUSD"], arrMov: [obj["movAcumEURUSD"]]};
+						for each(ec in modelApp.arrTendencias){
+							vela[ec.id] = (modelApp.arrDataGrafVelas.length - 1) * ec.pendiente + ec.coefCorte;
+						}
 						modelApp.arrDataGrafVelas.setItemAt(vela, modelApp.arrDataGrafVelas.length - 1);
 					} else {
 						vela = modelApp.arrDataGrafVelas.source[modelApp.arrDataGrafVelas.length - 1];	
