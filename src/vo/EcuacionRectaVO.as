@@ -8,6 +8,7 @@ package vo
 		public var coefCorte:Number;
 		public var id:String;
 		public var arrPtos:ArrayCollection = new ArrayCollection();
+		public var ordAsoc:Object;		
 		public function EcuacionRectaVO()
 		{
 			

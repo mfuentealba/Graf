@@ -21,10 +21,14 @@ package modelo
 		public var totalOperaciones:String = '0';
 		public var mayorOperaciones:String = '0';
 		public var menorOperaciones:String = '0';
-		public var conexion:ConexionSocket = new ConexionSocket();
+		public var conexion:ConexionSocket;
 		public var arrDataGraf:ArrayCollection = new ArrayCollection();
 		public var contVela:int;
 		public var objMin:Object = {};
+		public var swEnvioClick:Boolean = false;
+		
+		
+		
 		
 		public var arrMinimos:ArrayCollection = new ArrayCollection();
 		public var arrMinimosExcluidos:ArrayCollection = new ArrayCollection();

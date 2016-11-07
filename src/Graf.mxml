@@ -7,6 +7,7 @@
 					   creationComplete="windowedapplication1_creationCompleteHandler(event)">
 	<fx:Script>
 		<![CDATA[
+			import componentes.clases.ConexionSocket;
 			import componentes.clases.PanelPtos;
 			
 			import controlador.Controlador;
@@ -81,6 +82,7 @@
 			protected function windowedapplication1_creationCompleteHandler(event:FlexEvent):void
 			{
 				// TODO Auto-generated method stub
+				modelApp.conexion = new ConexionSocket();
 				modelApp.conexion.server = "127.0.0.1";
 				modelApp.conexion.port = 9004;
 				modelApp.conexion.ini();
@@ -96,7 +98,7 @@
 			protected function fnGeneraData(event:MouseEvent):void
 			{
 				// TODO Auto-generated method stub
-				modelApp.arrDataGraf = new ArrayCollection();
+				/*modelApp.arrDataGraf = new ArrayCollection();
 				modelApp.arrDataGrafOrd = new ArrayCollection();
 				modelApp.arrDataGrafOrdExec = new ArrayCollection();
 				modelApp.arrDataNiveles = new ArrayCollection();
@@ -105,8 +107,16 @@
 				modelApp.txtEURUSDTotal = '0';
 				modelApp.txtUSDCHFTotal = '0';
 				var generaDataEvent:GeneraDataEvent = new GeneraDataEvent(GeneraDataEvent.GENERA_DATA);
+				Controlador.getInstance().dispatchEvent(generaDataEvent);*/
+				addEventListener(GeneraDataEvent.AUTOGENERACION, fnCicloGenerador);
+				var generaDataEvent:GeneraDataEvent = new GeneraDataEvent(GeneraDataEvent.GENERA_PIP);
 				Controlador.getInstance().dispatchEvent(generaDataEvent);
 			}
+			
+			public function fnCicloGenerador(event:GeneraDataEvent):void{
+				btnGeneraVela.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+			}
+			
 			
 			protected function fnGeneraData2(event:MouseEvent):void
 			{
@@ -265,14 +275,14 @@
 			protected function txtSearch_changeHandler(event:TextOperationEvent):void
 			{
 				// TODO Auto-generated method stub
-				if(txtSearch.text != ''){
+				/*if(txtSearch.text != ''){
 					modelApp.arrDataGrafPR.filterFunction = fnSearch;
 					modelApp.arrDataGrafPR.refresh();
 				} else {
 					modelApp.arrDataGrafPR.filterFunction = null;
 					modelApp.arrDataGrafPR.refresh();
 				}
-					
+			*/		
 				
 			}
 			
@@ -325,7 +335,7 @@
 					<s:RadioButton label="H1" groupName="rbTemporalidad"/>
 					<s:RadioButton label="H4" groupName="rbTemporalidad"/>
 					<s:Button label="Genera Data" click="fnGeneraData(event)"/>
-					<s:Button label="Genera Data2" click="fnGeneraData2(event)"/>
+					<s:Button id="btnGeneraVela" label="Genera Data2" click="fnGeneraData2(event)"/>
 					<s:Button label="Genera por pip" click="fnGeneraData3(event)"/>
 					<s:Button label="Reset" click="fnReset(event)"/>
 					<s:Button label="Compra" click="fnGeneraOrdenManual(event)"/>

@@ -19,6 +19,7 @@ package componentes.clases
 	
 	import modelo.Modelo;
 	
+	import mx.core.FlexGlobals;
 	import mx.managers.PopUpManager;
 
 	public class ConexionSocket extends Sprite
@@ -30,7 +31,7 @@ package componentes.clases
 		public var callback:Function;
 		public var callbackRecep:Function;
 		public var funPostConexion:Function;
-		
+		[Bindable] private var modelApp:Modelo = Modelo.getInstance();
 		public function ConexionSocket()
 		{
 			//this.ini();
@@ -120,7 +121,13 @@ package componentes.clases
 			} catch (error : Error) {
 				//  TRACE
 				trace("_onDataReceived error:  " + error);
+			} 
+			if(modelApp.swEnvioClick){
+				modelApp.swEnvioClick = false;
+				var generaDataEvent:GeneraDataEvent = new GeneraDataEvent(GeneraDataEvent.AUTOGENERACION);
+				FlexGlobals.topLevelApplication.dispatchEvent(generaDataEvent);
 			}
+			
 		}
 		
 		private function _onIOError(aEvent : IOErrorEvent):void

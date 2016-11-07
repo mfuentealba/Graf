@@ -10,6 +10,7 @@ package eventos
 		public static const GENERA_POR_PIP:String = 'GeneraPorPipEvent';
 		public static const RESET_PIP:String = 'ResetPipEvent';
 		public static const EPREFRESH:String = 'ResetPipRefreshEvent';
+		public static const AUTOGENERACION:String = 'AutoGeneracionEvent';
 		
 		
 		public const clase:String = 'GeneraDataEvent';

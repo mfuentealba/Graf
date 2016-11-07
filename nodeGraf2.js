@@ -633,7 +633,7 @@ function receiveData(socket, d) {
 				for(var contt = 0; iEP < arrResultEURUSD.length && contt < valorVela; contt++){
 					var indexIguales = 1;
 					RowEURUSD = arrResultEURUSD[iEP];
-					
+						//sleep(10);
 					fecha = RowEURUSD['fecha'].split(' ')[1];
 					var minN = parseInt(fecha.split(':')[1]);
 					var segN = parseInt(fecha.split(':')[2]);
