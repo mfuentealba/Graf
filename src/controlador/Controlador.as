@@ -130,7 +130,10 @@ package controlador
 					if(obj.sl > obj['ganancia']){
 						obj.estado = 'Cerrado';
 					} else {
-						obj.sl = obj['ganancia'] - 20;
+						if(obj['ganancia'] > 100){
+							obj.sl = obj['ganancia'] - 50;	
+						}
+						
 					}
 					/*if(obj.tp < obj['ganancia']){
 						obj.estado = 'Cerrado';
