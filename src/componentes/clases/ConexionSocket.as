@@ -107,7 +107,7 @@ package componentes.clases
 				_textField.scrollV = _textField.maxScrollV;*/
 				var event:DataTranferidaEvent = new DataTranferidaEvent(DataTranferidaEvent.REGISTRA, String(aEvent.data));
 				Controlador.getInstance().dispatchEvent(event);
-				trace(aEvent.data);
+				//trace(aEvent.data);
 				if(String(aEvent.data).split('|')[0] == 'RECEP'){
 					this.callbackRecep.call(this, aEvent);	
 				} else {
@@ -122,7 +122,7 @@ package componentes.clases
 				//  TRACE
 				trace("_onDataReceived error:  " + error);
 			} 
-			if(modelApp.swEnvioClick){
+			if(modelApp.swEnvioClick && modelApp.contVela < 1442){
 				modelApp.swEnvioClick = false;
 				var generaDataEvent:GeneraDataEvent = new GeneraDataEvent(GeneraDataEvent.AUTOGENERACION);
 				FlexGlobals.topLevelApplication.dispatchEvent(generaDataEvent);

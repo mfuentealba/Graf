@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:DataTip xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			xmlns:s="library://ns.adobe.com/flex/spark" 
-			xmlns:mx="library://ns.adobe.com/flex/mx">
+			xmlns:mx="library://ns.adobe.com/flex/mx" width="50" height="50">
 	<fx:Script>
 		<![CDATA[
 			import mx.charts.HitData;
@@ -28,24 +28,15 @@
 			
 			private function formatDataTip(hd:HitData):String
 			{
-				var dt:String = "";
+				var dt:String = "";				
+				dt += '<i>High: </i>' + hd.item['High'] + '\n';
+				dt += '<i>Open: </i>' + hd.item['Open'] + '\n';
+				dt += '<i>Close: </i>' + hd.item['Close'] + '\n';
+				dt += '<i>Low</i>' + hd.item['Low'] + '\n';
 				
-				var n:String = hd.element['legendData'][0]['label'];
-				if (n && n != "")
-					dt += "<b>" + n + "</b><BR/>";
-
-				var xName:String = 'Secuencia';//dataTransform.getAxis(CartesianTransform.HORIZONTAL_AXIS).displayName;
-				if (xName != "")
-					dt += "<i>" + xName+ ":</i> ";
-				dt += hd.item['sec']/*dataTransform.getAxis(CartesianTransform.HORIZONTAL_AXIS).formatForScreen(
-					LineSeriesItem(hd.chartItem).xValue)*/ + "\n";
 				
-				var yName:String = "Cantidad";//dataTransform.getAxis(CartesianTransform.VERTICAL_AXIS).displayName;
-				if (yName != "")
-					dt += "<i>" + yName + ":</i> ";
-				dt += hd.item['movAcum' + hd.element['legendData'][0]['label']]/*dataTransform.getAxis(CartesianTransform.VERTICAL_AXIS).formatForScreen(
-					LineSeriesItem(hd.chartItem).yValue)*/ + "\n";
-				
+				dt += '<i>promedio: </i>' + hd.item['promedio'] + '\n';
+				dt += '<i>cantidad: </i>' + hd.item['cantidad'] + '\n';
 				return dt;
 			}
 			

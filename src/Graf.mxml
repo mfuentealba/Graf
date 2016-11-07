@@ -354,7 +354,8 @@
 										 paddingLeft="5" 
 										 showDataTips="true"
 										 dataProvider="{modelApp.arrDataGrafVelas}"
-										 creationComplete="grVelas_creationCompleteHandler(event)">
+										 creationComplete="grVelas_creationCompleteHandler(event)"
+										 dataTipRenderer="componentes.clases.DataTipExtra">
 						<mx:verticalAxis>
 							<mx:LinearAxis id="vaxis" baseAtZero="false" title="Price"/>
 						</mx:verticalAxis>
