@@ -129,10 +129,12 @@ package controlador
 					modelApp.totalOperaciones = (Number(modelApp.totalOperaciones) + Number(obj['ganancia'])) + '';
 					if(obj.sl > obj['ganancia']){
 						obj.estado = 'Cerrado';
+					} else {
+						obj.sl = obj['ganancia'] - 20;
 					}
-					if(obj.tp < obj['ganancia']){
+					/*if(obj.tp < obj['ganancia']){
 						obj.estado = 'Cerrado';
-					}
+					}*/
 				}
 				
 			} else if(obj['divisa'] == 'USDCHF'){
