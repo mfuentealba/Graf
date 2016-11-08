@@ -64,8 +64,6 @@ package modelo
 		public var txtUSDCHF:String;
 		public var txtSec:String;
 		
-		public var arrDataGrafPR:ArrayCollectionUp = new ArrayCollectionUp();
-		public var arrDataGrafPROrig:ArrayCollectionMio = new ArrayCollectionMio();
 		public var objDataGrafPR:Object = {};
 		
 		
