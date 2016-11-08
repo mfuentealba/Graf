@@ -74,7 +74,7 @@ var posibleNivelEURUSD = {};
 var posibleNivelUSDCHF = {};
 var segMin = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59]
 
-var sqlExec = "SELECT RateDateTime fecha, RateBid precio_bid, RateAsk precio_ask, 'EURUSD' FROM `eurusd_der2010_enero` ORDER BY RateDateTime ASC"; 
+var sqlExec = "SELECT LEFT(RateDateTime, 19) fecha, RateBid precio_bid, RateAsk precio_ask, 'EURUSD' FROM `eurusd_der2014_marzo` ORDER BY RateDateTime ASC"; 
 dbExecute(sqlExec, fnEURUSD, []);
 
 
@@ -94,6 +94,7 @@ function fnEURUSD(err, results, fields, arrParam){
 			
 			arrResultEURUSD = results;
 			fechaEP = arrResultEURUSD[0]['fecha'].split(' ')[1];
+			console.log(arrResultEURUSD[0]['fecha']);
 			minEP = parseInt(fechaEP.split(':')[1]);
 			segEP = parseInt(fechaEP.split(':')[2]);				
 			fechaEP_RESET = arrResultEURUSD[0]['fecha'].split(' ')[1];

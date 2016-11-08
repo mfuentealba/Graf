@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Panel xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="600" height="380">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.managers.PopUpManager;
+			
+			import vo.EcuacionRectaVO;
+			[Bindable] public var orden:EcuacionRectaVO;
+			
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				PopUpManager.removePopUp(this);
+			}
+			
+		]]>
+	</fx:Script>
+	<s:Form left="0" right="0" top="0" bottom="50">
+		<s:FormItem width="100%" label="Punto Inicial">
+			<s:HGroup width="100%">
+				<s:Label text="{orden.arrPtos.getItemAt(0)['num']}"/>
+				<s:Label text="Promedio:"/>
+				<s:Label text="{orden.arrPtos.getItemAt(0)['vela']['promedio']}"/>
+				<s:Label text="Cantidad:"/>
+				<s:Label text="{orden.arrPtos.getItemAt(0)['vela']['cantidad']}"/>
+				<s:Label text="Cierre:"/>
+				<s:Label text="{orden.arrPtos.getItemAt(0)['vela']['Close']}"/>
+				<s:Label text="Maximo:"/>
+				<s:Label text="{orden.arrPtos.getItemAt(0)['vela']['High']}"/>
+				<s:Label text="Minimo:"/>
+				<s:Label text="{orden.arrPtos.getItemAt(0)['vela']['Low']}"/>
+			</s:HGroup>
+			
+		</s:FormItem>
+		<s:FormItem width="100%" label="Punto Secundario">
+			<s:HGroup width="100%">
+				<s:Label text="{orden.arrPtos.getItemAt(1)['num']}"/>
+				<s:Label text="Promedio:"/>
+				<s:Label text="{orden.arrPtos.getItemAt(1)['vela']['promedio']}"/>
+				<s:Label text="Cantidad:"/>
+				<s:Label text="{orden.arrPtos.getItemAt(1)['vela']['cantidad']}"/>
+				<s:Label text="Cierre:"/>
+				<s:Label text="{orden.arrPtos.getItemAt(1)['vela']['Close']}"/>
+				<s:Label text="Maximo:"/>
+				<s:Label text="{orden.arrPtos.getItemAt(1)['vela']['High']}"/>
+				<s:Label text="Minimo:"/>
+				<s:Label text="{orden.arrPtos.getItemAt(1)['vela']['Low']}"/>
+			</s:HGroup>
+		</s:FormItem>
+		<s:FormItem width="100%" label="Punto Confirmacion">
+			<s:HGroup width="100%">
+				<s:Label text="{orden.arrPtos.getItemAt(2)['num']}"/>
+				<s:Label text="Promedio:"/>
+				<s:Label text="{orden.arrPtos.getItemAt(2)['vela']['promedio']}"/>
+				<s:Label text="Cantidad:"/>
+				<s:Label text="{orden.arrPtos.getItemAt(2)['vela']['cantidad']}"/>
+				<s:Label text="Cierre:"/>
+				<s:Label text="{orden.arrPtos.getItemAt(2)['vela']['Close']}"/>
+				<s:Label text="Maximo:"/>
+				<s:Label text="{orden.arrPtos.getItemAt(2)['vela']['High']}"/>
+				<s:Label text="Minimo:"/>
+				<s:Label text="{orden.arrPtos.getItemAt(2)['vela']['Low']}"/>
+			</s:HGroup>
+		</s:FormItem>
+		<s:FormItem width="100%" label="Pendiente">
+			<s:Label text="{orden.pendiente + ''}"/>
+		</s:FormItem>
+		<s:FormItem width="100%" label="Coef. corte">
+			<s:Label text="{orden.coefCorte + ''}"/>
+		</s:FormItem>
+		<s:FormItem width="100%" label="Resultado">
+			<s:Label text="{orden.ordAsoc['ganancia'] + ''}"/>
+		</s:FormItem>
+	</s:Form>
+	<s:Button bottom="15" label="OK" horizontalCenter="0" click="button1_clickHandler(event)"/>
+</s:Panel>

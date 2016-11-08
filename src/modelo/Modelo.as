@@ -26,6 +26,8 @@ package modelo
 		public var contVela:int;
 		public var objMin:Object = {};
 		public var swEnvioClick:Boolean = false;
+		public var promedioVela:Number = 0;
+		public var cantidadTRansVela:Number = 0;
 		
 		
 		

@@ -127,14 +127,14 @@ package controlador
 					obj['pip'] += movEURUSD['mov'] * (obj['tipo'] == 'C' ? 1 : -1);
 					obj['spread'] = movEURUSD['spread'];
 					modelApp.totalOperaciones = (Number(modelApp.totalOperaciones) + Number(obj['ganancia'])) + '';
-					if(obj.sl > obj['ganancia']){
+					/*if(obj.sl > obj['ganancia']){
 						obj.estado = 'Cerrado';
 					} else {
 						if(obj['ganancia'] > 100){
 							obj.sl = obj['ganancia'] - 50;	
 						}
 						
-					}
+					}*/
 					/*if(obj.tp < obj['ganancia']){
 						obj.estado = 'Cerrado';
 					}*/
@@ -300,9 +300,12 @@ package controlador
 						modelApp.arrDataGrafVelas.removeItemAt(0);
 						
 					}
-					fnProc.call(this, obj, arrParam[4], arrParam[5]);
+					
 					modelApp.arrDataGrafOrdExec.source.forEach(fnRecalculaOrden);
 					modelApp.arrDataGrafOrdExec.refresh();
+					
+					fnProc.call(this, obj, arrParam[4], arrParam[5]);
+					
 					
 					
 					
@@ -445,9 +448,9 @@ package controlador
 			obj["tendenciaEURUSD"] = 'N';
 			obj["tendenciaUSDCHF"] = 'N';
 			
-			vela = {Open: 0,  High: 0, Low: 0, Close:0, arrMov: []};
+			vela = {Open: 0,  High: 0, Low: 0, Close:0/*, arrMov: []*/};
 			modelApp.arrDataGrafVelas.addItem(vela);
-			vela = {Open: 0,  High: 0, Low: 0, Close:0, arrMov: []};
+			vela = {Open: 0,  High: 0, Low: 0, Close:0/*, arrMov: []*/};
 			modelApp.arrDataGrafVelas.addItem(vela);
 			modelApp.arrDataGraf.addItem(obj);
 			modelApp.contVela = 1;
@@ -458,83 +461,84 @@ package controlador
 		
 		private function fnSec(obj:Object, opt:String, serie:String):void{
 			
-			obj["movAcumEURUSD"] = int((obj["precio_bidEURUSD"] - modelApp.arrDataGraf.source[0]["precio_bidEURUSD"]) * 100000);
-			//obj["movAcumUSDCHF"] = int((obj2["precio_bidUSDCHF"] - modelApp.arrDataGraf.source[0]["precio_bidUSDCHF"]) * 100000);
-			obj["movEURUSD"] = int((obj["precio_bidEURUSD"] - modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]["precio_bidEURUSD"]) * 100000);
-			//obj["movUSDCHF"] = int((obj2["precio_bidUSDCHF"] - modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]["precio_bidUSDCHF"]) * 100000);
-			obj['claveEURUSD'] = 'EURUSD|' + modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]["movAcumEURUSD"];
-			
-			if(obj["movEURUSD"] > 0){
-				obj['tendenciaEURUSD'] = 'A';
-			} else if(obj["movEURUSD"] < 0){
-				obj['tendenciaEURUSD'] = 'B';
-			} else {
-				obj['tendenciaEURUSD'] = modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]["tendenciaEURUSD"];
-			}
-			
-			
-			movEURUSD = {};
-			movUSDCHF = {};
-			movEURUSD['mov'] = obj["movEURUSD"];
-			movEURUSD['spread'] = obj["spreadEURUSD"];
-			
-			
-			if(modelApp.codPerIn + 1 == modelApp.codPer){				
+			try{
+				obj["movAcumEURUSD"] = int((obj["precio_bidEURUSD"] - modelApp.arrDataGraf.source[0]["precio_bidEURUSD"]) * 100000);
+				//obj["movAcumUSDCHF"] = int((obj2["precio_bidUSDCHF"] - modelApp.arrDataGraf.source[0]["precio_bidUSDCHF"]) * 100000);
+				obj["movEURUSD"] = int((obj["precio_bidEURUSD"] - modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]["precio_bidEURUSD"]) * 100000);
+				//obj["movUSDCHF"] = int((obj2["precio_bidUSDCHF"] - modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]["precio_bidUSDCHF"]) * 100000);
+				obj['claveEURUSD'] = 'EURUSD|' + modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]["movAcumEURUSD"];
 				
-				modelApp.codPerIn = 0;
-				
-				modelApp.swEnvioClick = true;
-				
-				/****************************************-NIVELES-**********************************/
-				vela = modelApp.arrDataGrafVelas.source[modelApp.arrDataGrafVelas.length - 1];
-				var velaAnterior:Object = modelApp.arrDataGrafVelas.source[modelApp.arrDataGrafVelas.length - 2];
-				
-				var item:Object;
-				
-				if(modelApp.contVela == 828){//1883
-					modelApp.contVela = 828;
+				if(obj["movEURUSD"] > 0){
+					obj['tendenciaEURUSD'] = 'A';
+				} else if(obj["movEURUSD"] < 0){
+					obj['tendenciaEURUSD'] = 'B';
+				} else {
+					obj['tendenciaEURUSD'] = modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]["tendenciaEURUSD"];
 				}
 				
-				var objNuevo:Object = {num: vela['Close'] < velaAnterior['Close'] ? modelApp.contVela : modelApp.contVela - 1,  valor: vela['Close'] < velaAnterior['Close'] ? vela['Close'] : velaAnterior['Close']};
-				if(modelApp.arrMinimos.length > 10){
-					trace("Mas de 10");
-				}
 				
-				var arrElim:Array = [];
-				var ptoElim:Object;
-				var a:NodoPendientes;
-				var n:int = modelApp.arrMinimos.length;
-				for(var j:int = 0; j < n; j++){//ELIMINO LOS PUNTOS BASE MENORES AL NUEVO
-					a = NodoPendientes(modelApp.arrMinimos.getItemAt(j));
-					if(a.ptoInicial['valor'] > objNuevo['valor']){
-						ptoElim = modelApp.arrMinimos.removeItemAt(j)['ptoInicial'];
-						arrElim.push(ptoElim);
-						j--;
-						n--;
-					} 	
-				}
-				for each(ptoElim in arrElim){//EN LAS PROYECCIONES DE CADA PUNTO SOBREVIVIENTE ELIMINO LOS PUNTOS ELIMINADOS
-					for each(var nodo:NodoPendientes in modelApp.arrMinimos){
+				movEURUSD = {};
+				movUSDCHF = {};
+				movEURUSD['mov'] = obj["movEURUSD"];
+				movEURUSD['spread'] = obj["spreadEURUSD"];
+				
+				
+				if(modelApp.codPerIn + 1 == modelApp.codPer){				
 					
-						for each(var arrPuntos:ArrayCollection in nodo.arrayPosibles){
-							var ind:int = arrPuntos.getItemIndex(ptoElim);
-							if(ind > -1){
-								arrPuntos.removeItemAt(ind);
-								if(arrPuntos.length == 0){
-									nodo.arrayPosibles.removeItemAt(nodo.arrayPosibles.getItemIndex(arrPuntos));
+					modelApp.codPerIn = 0;
+					
+					modelApp.swEnvioClick = true;
+					
+					/****************************************-NIVELES-**********************************/
+					vela = modelApp.arrDataGrafVelas.source[modelApp.arrDataGrafVelas.length - 1];
+					var velaAnterior:Object = modelApp.arrDataGrafVelas.source[modelApp.arrDataGrafVelas.length - 2];
+					
+					var item:Object;
+					
+					if(modelApp.contVela == 372){//1883
+						modelApp.contVela = 372;
+					}
+					
+					var objNuevo:Object = {num: vela['Close'] < velaAnterior['Close'] ? modelApp.contVela : modelApp.contVela - 1,  valor: vela['Close'] < velaAnterior['Close'] ? vela['Close'] : velaAnterior['Close']};
+					if(modelApp.arrMinimos.length > 10){
+						trace("tiene " + modelApp.arrMinimos.length + "NODOS DE MINIMOS" );
+					}
+					
+					var arrElim:Array = [];
+					var ptoElim:Object;
+					var a:NodoPendientes;
+					var n:int = modelApp.arrMinimos.length;
+					for(var j:int = 0; j < n; j++){//ELIMINO LOS PUNTOS BASE MENORES AL NUEVO
+						a = NodoPendientes(modelApp.arrMinimos.getItemAt(j));
+						if(a.ptoInicial['valor'] > objNuevo['valor']){
+							ptoElim = modelApp.arrMinimos.removeItemAt(j)['ptoInicial'];
+							arrElim.push(ptoElim);
+							j--;
+							n--;
+						} 	
+					}
+					for each(ptoElim in arrElim){//EN LAS PROYECCIONES DE CADA PUNTO SOBREVIVIENTE ELIMINO LOS PUNTOS ELIMINADOS
+						for each(var nodo:NodoPendientes in modelApp.arrMinimos){
+							
+							for each(var arrPuntos:ArrayCollection in nodo.arrayPosibles){
+								var ind:int = arrPuntos.getItemIndex(ptoElim);
+								if(ind > -1){
+									arrPuntos.removeItemAt(ind);
+									if(arrPuntos.length == 0){
+										nodo.arrayPosibles.removeItemAt(nodo.arrayPosibles.getItemIndex(arrPuntos));
+									}	
 								}	
 							}	
 						}	
-					}	
+						
+					}
 					
-				}
-				
-				
-				
-				
-				if(velaAnterior['Open'] < velaAnterior['Close'] && vela['Open'] > vela['Close']){//verde-roja
-					/*var nivel:int = vela['High'] <= velaAnterior['High'] ? velaAnterior['High'] : vela['High'];
-					if(modelApp.objDataNiveles.hasOwnProperty('EURUSD|' + nivel)){
+					
+					
+					
+					if(velaAnterior['Open'] < velaAnterior['Close'] && vela['Open'] > vela['Close']){//verde-roja
+						/*var nivel:int = vela['High'] <= velaAnterior['High'] ? velaAnterior['High'] : vela['High'];
+						if(modelApp.objDataNiveles.hasOwnProperty('EURUSD|' + nivel)){
 						var i:int = modelApp.arrDataNiveles.getItemIndex(modelApp.objDataNiveles['EURUSD|' + nivel]);
 						item = modelApp.arrDataNiveles.getItemAt(i);
 						item.mov = 'Resistencia';
@@ -542,7 +546,7 @@ package controlador
 						var dist:int = modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'] - item.arrSec[item.arrSec.length - 1]['sec']; 
 						item.arrSec.addItem({sec: modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'], dist: dist, vela: modelApp.arrDataGrafVelas.length - 1, accion: 'resistencia'});
 						modelApp.arrDataNiveles.setItemAt(item, i);
-					} else {
+						} else {
 						item = {};			
 						item.movIni = 'EURUSD|' + nivel;
 						item.divisa = 'EURUSD';
@@ -551,14 +555,14 @@ package controlador
 						item.arrSec = new ArrayCollection([{sec: modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'], dist: 0, vela: modelApp.arrDataGrafVelas.length - 1, accion: 'resistencia'}]);
 						modelApp.arrDataNiveles.addItem(item);
 						modelApp.objDataNiveles[item.movIni] = item;
-					}*/
-				
-					
-									
-					
-				} else if(vela['Open'] < vela['Close'] && velaAnterior['Open'] > velaAnterior['Close']){//roja-verde
-					/*nivel = vela['Low'] <= velaAnterior['Low'] ? vela['Low'] : velaAnterior['Low'];  
-					if(modelApp.objDataNiveles.hasOwnProperty('EURUSD|' + nivel)){
+						}*/
+						
+						
+						
+						
+					} else if(vela['Open'] < vela['Close'] && velaAnterior['Open'] > velaAnterior['Close']){//roja-verde
+						/*nivel = vela['Low'] <= velaAnterior['Low'] ? vela['Low'] : velaAnterior['Low'];  
+						if(modelApp.objDataNiveles.hasOwnProperty('EURUSD|' + nivel)){
 						i = modelApp.arrDataNiveles.getItemIndex(modelApp.objDataNiveles['EURUSD|' + nivel]);
 						item = modelApp.arrDataNiveles.getItemAt(i);
 						item.mov = 'Soporte';
@@ -566,7 +570,7 @@ package controlador
 						dist = modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'] - item.arrSec[item.arrSec.length - 1]['sec']; 
 						item.arrSec.addItem({sec: modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'], dist: dist, vela: modelApp.arrDataGrafVelas.length - 1, accion: 'soporte'});
 						modelApp.arrDataNiveles.setItemAt(item, i);
-					} else {
+						} else {
 						item = {};			
 						item.movIni = 'EURUSD|' + nivel;
 						item.divisa = 'EURUSD';
@@ -575,144 +579,168 @@ package controlador
 						item.arrSec = new ArrayCollection([{sec: modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'], dist: 0, vela: modelApp.arrDataGrafVelas.length - 1, accion: 'soporte'}]);
 						modelApp.arrDataNiveles.addItem(item);
 						modelApp.objDataNiveles[item.movIni] = item;
-					}
-					*/
-					
-					if(n == 0){
-						a = new NodoPendientes();
-						a.ptoInicial = objNuevo;
-						modelApp.arrMinimos.addItem(a);
-						modelApp.objMin[objNuevo.num] = a;
-					} else {
-						n = modelApp.arrMinimos.length;
-						for(j = 0; j < n; j++){//UNA VEZ ELIMINADO DE TODOS LOS ARRAY LOS VALORES MAYORES PROCEDO A INSERTAR EL VALOR NUEVO
-							nodo = NodoPendientes(modelApp.arrMinimos.getItemAt(j));
-							if(nodo.arrayPosibles.length > 0){
-								var m:int = nodo.arrayPosibles.length;
-								for(var s:int = 0; s < m; s++){
-									arrPuntos = ArrayCollection(nodo.arrayPosibles.getItemAt(s));
-									var arrMin:ArrayCollection = new ArrayCollection([nodo.ptoInicial]);
-									arrMin.addAll(arrPuntos);	
-									var swPerteneceTendencia:Boolean = false;
-									for each(var lin:EcuacionRectaVO in modelApp.arrTendencias){
-										var res:Number = lin.pendiente * objNuevo['num'] + lin.coefCorte;
-										if(objNuevo['valor'] >= res && objNuevo['valor'] - 10 <= res){
-											//lin.arrPtos.addItem(objNuevo);COSUME RAM
-											swPerteneceTendencia = true;
-										}
-									}
-									
-									if(!swPerteneceTendencia){
-										var valorAnterior:Object = arrMin.getItemAt(arrMin.length - 1);
-										arrMin.addItem(objNuevo);
-										//Crea orden y saca proyeccion segun pendiente
-										var valorInicial:Object = nodo.ptoInicial;
-										modelApp.proyeccionAlcista = (valorInicial['valor'] - valorAnterior['valor']) / (valorInicial['num'] - valorAnterior['num']);
-										modelApp.corteMinAlcista = valorAnterior['valor'] - valorAnterior['num'] * modelApp.proyeccionAlcista;
-										if(objNuevo['valor'] >= modelApp.proyeccionAlcista * objNuevo['num'] + modelApp.corteMinAlcista && objNuevo['valor'] - modelApp.proyeccionAlcista <= modelApp.proyeccionAlcista * objNuevo['num'] + modelApp.corteMinAlcista){
-											
-											fnGeneraLineaTendencia_y_orden(j, valorInicial, objNuevo, arrMin);
-											nodo.arrayPosibles.removeItemAt(nodo.arrayPosibles.getItemIndex(arrPuntos));
-											m--;
-											s--;
-											
-										} else {
-											if(objNuevo['valor'] < modelApp.proyeccionAlcista * objNuevo['num'] + modelApp.corteMinAlcista){
-												arrMin.removeItemAt(arrMin.getItemIndex(valorAnterior));
-												arrPuntos.removeItemAt(0);
-												arrPuntos.addItem(objNuevo);
-												//nodo.arrayPosibles.removeItemAt(nodo.arrayPosibles.getItemIndex(arrPuntos));
-											} else {
-												arrMin.removeItemAt(arrMin.length - 1);											
-												if(!modelApp.objMin.hasOwnProperty(valorAnterior.num)){
-													a = new NodoPendientes();
-													a.ptoInicial = valorAnterior;
-													a.arrayPosibles.addItem(new ArrayCollection([objNuevo]));
-													modelApp.arrMinimos.addItem(a);
-													modelApp.objMin[valorAnterior.num] = valorAnterior;
-												}
-												
-												
-											}
-										}									
-									}	
-								}		
-							} else {
-								nodo.arrayPosibles.addItem(new ArrayCollection([objNuevo]));
-							}
-						}	
-					}		
-											
-				}
-				
-				var velaAux:Object = modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 1);
-				var ext:int = 1;
-				for each(var ec:EcuacionRectaVO in modelApp.arrTendencias){					
-					velaAux[ec.id] = (modelApp.contVela) * ec.pendiente + ec.coefCorte;
-					if(velaAux[ec.id] > velaAux['Close']){
-						if(ec.ordAsoc){
-							ec.ordAsoc['estado'] = 'Cerrado';
-							modelApp.arrDataGrafOrdExec.setItemAt(ec.ordAsoc, modelApp.arrDataGrafOrdExec.getItemIndex(ec.ordAsoc)); 
-							modelApp.proyeccionAlcistaBL = false;
-							
-							
 						}
-						modelApp.arrTendencias.removeItemAt(modelApp.arrTendencias.getItemIndex(ec));
-						var arrTraspaso:Array = modelApp.grVelas.series;
-						modelApp.grVelas.series = null;
-						arrTraspaso.splice(ext, 1);
-						modelApp.grVelas.series = arrTraspaso;
+						*/
+						
+						if(n == 0){
+							a = new NodoPendientes();
+							a.ptoInicial = objNuevo;
+							modelApp.arrMinimos.addItem(a);
+							modelApp.objMin[objNuevo.num] = a;
+						} else {
+							n = modelApp.arrMinimos.length;
+							for(j = 0; j < n; j++){//UNA VEZ ELIMINADO DE TODOS LOS ARRAY LOS VALORES MAYORES PROCEDO A INSERTAR EL VALOR NUEVO
+								nodo = NodoPendientes(modelApp.arrMinimos.getItemAt(j));
+								if(nodo.arrayPosibles.length > 0){
+									var m:int = nodo.arrayPosibles.length;
+									for(var s:int = 0; s < m; s++){
+										arrPuntos = ArrayCollection(nodo.arrayPosibles.getItemAt(s));
+										var arrMin:ArrayCollection = new ArrayCollection([nodo.ptoInicial]);
+										arrMin.addAll(arrPuntos);	
+										var swPerteneceTendencia:Boolean = false;
+										for each(var lin:EcuacionRectaVO in modelApp.arrTendencias){
+											var res:Number = lin.pendiente * objNuevo['num'] + lin.coefCorte;
+											if(objNuevo['valor'] >= res && objNuevo['valor'] - 10 <= res){
+												//lin.arrPtos.addItem(objNuevo);COSUME RAM
+												swPerteneceTendencia = true;
+											}
+										}
+										
+										if(!swPerteneceTendencia){
+											var valorAnterior:Object = arrMin.getItemAt(arrMin.length - 1);
+											arrMin.addItem(objNuevo);
+											//Crea orden y saca proyeccion segun pendiente
+											var valorInicial:Object = nodo.ptoInicial;
+											modelApp.proyeccionAlcista = (valorInicial['valor'] - valorAnterior['valor']) / (valorInicial['num'] - valorAnterior['num']);
+											modelApp.corteMinAlcista = valorAnterior['valor'] - valorAnterior['num'] * modelApp.proyeccionAlcista;
+											if(objNuevo['valor'] >= modelApp.proyeccionAlcista * objNuevo['num'] + modelApp.corteMinAlcista && objNuevo['valor'] - modelApp.proyeccionAlcista <= modelApp.proyeccionAlcista * objNuevo['num'] + modelApp.corteMinAlcista){
+												
+												fnGeneraLineaTendencia_y_orden(j, valorInicial, objNuevo, arrMin);
+												nodo.arrayPosibles.removeItemAt(nodo.arrayPosibles.getItemIndex(arrPuntos));
+												m--;
+												s--;
+												
+											} else {
+												if(objNuevo['valor'] < modelApp.proyeccionAlcista * objNuevo['num'] + modelApp.corteMinAlcista){
+													arrMin.removeItemAt(arrMin.getItemIndex(valorAnterior));
+													arrPuntos.removeItemAt(0);
+													arrPuntos.addItem(objNuevo);
+													//nodo.arrayPosibles.removeItemAt(nodo.arrayPosibles.getItemIndex(arrPuntos));
+												} else {
+													arrMin.removeItemAt(arrMin.length - 1);											
+													if(!modelApp.objMin.hasOwnProperty(valorAnterior.num)){
+														a = new NodoPendientes();
+														a.ptoInicial = valorAnterior;
+														a.arrayPosibles.addItem(new ArrayCollection([objNuevo]));
+														modelApp.arrMinimos.addItem(a);
+														modelApp.objMin[valorAnterior.num] = valorAnterior;
+													}
+													
+													
+												}
+											}									
+										}	
+									}		
+								} else {
+									nodo.arrayPosibles.addItem(new ArrayCollection([objNuevo]));
+								}
+							}	
+						}		
 						
 					}
-					ext++;
-				}
-				
-				/**************************************************************/
-				if(opt == 'S'){
-					vela = {Open: obj["movAcumEURUSD"],  High: obj["movAcumEURUSD"], Low: obj["movAcumEURUSD"], Close:obj["movAcumEURUSD"], arrMov: [obj["movAcumEURUSD"]]};
-					modelApp.arrDataGrafVelas.addItem(vela);		
-				} else {/*
-					SE CREA VELA NUEVA QUE EN EL MOMENTO EN QUE LLEGA UN NUEVO MOVIMIENTO SE REINICIARA PARA QUE ESE MOVIMIENTO SE TOME COMO EL PRIMER TIC Y NO EL CIERRE ANTERIOR; 
-					SI LLEGASE A NO HABER MOV EN ESTA VELA ENTONCES SE DEJA COMO ESPACIO Y TENDRIA UNA VELA SIN MOVIMIENNTOS
-					*/
-					vela = modelApp.arrDataGrafVelas.source[modelApp.arrDataGrafVelas.length - 1];
-					vela = {Open: vela["Close"],  High: vela["Close"], Low: vela["Close"], Close: vela["Close"], arrMov: []};
-					modelApp.arrDataGrafVelas.addItem(vela);	
-					vela = null;
-				}
-				modelApp.contVela++;
-				
-				
-			} else {
-				if(serie == 'S'){/************SI HAY MAS DE UN PIP EN EL MISMO SEGUNDO NO SUMO***********************/
-					modelApp.codPerIn++;	
-				}
-				
-				if(opt == 'S'){/************ACTUALIZO VELA***********************/
-					if(vela == null){
-						vela = {Open: obj["movAcumEURUSD"],  High: obj["movAcumEURUSD"], Low: obj["movAcumEURUSD"], Close:obj["movAcumEURUSD"], arrMov: [obj["movAcumEURUSD"]]};
-						/*for each(ec in modelApp.arrTendencias){ ESTO EVALUABA CADA PIP Y ESO ERA MUCHO PROCESO, ADEMAS ES MAS IMPORTANTE EL CIERRE
-							vela[ec.id] = modelApp.contVela * ec.pendiente + ec.coefCorte;
-						}*/
-						modelApp.arrDataGrafVelas.setItemAt(vela, modelApp.arrDataGrafVelas.length - 1);
-					} else {
-						vela = modelApp.arrDataGrafVelas.source[modelApp.arrDataGrafVelas.length - 1];	
+					
+					var velaAux:Object = modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 1);
+					var ext:int = 1;
+					for each(var ec:EcuacionRectaVO in modelApp.arrTendencias){					
+						velaAux[ec.id] = (modelApp.contVela) * ec.pendiente + ec.coefCorte;
+						if(velaAux[ec.id] > velaAux['Close'] || ec.ordAsoc['ganancia'] < ec.ordAsoc['sl']){
+							if(ec.ordAsoc){
+								ec.ordAsoc['estado'] = 'Cerrado';
+								modelApp.arrDataGrafOrdExec.setItemAt(ec.ordAsoc, modelApp.arrDataGrafOrdExec.getItemIndex(ec.ordAsoc)); 
+								modelApp.proyeccionAlcistaBL = false;
+								
+								
+							}
+							modelApp.arrTendencias.removeItemAt(modelApp.arrTendencias.getItemIndex(ec));
+							var arrTraspaso:Array = modelApp.grVelas.series;
+							modelApp.grVelas.series = null;
+							arrTraspaso.splice(ext, 1);
+							modelApp.grVelas.series = arrTraspaso;
+							
+						} else {
+							if(ec.ordAsoc['ganancia'] > 100){
+								ec.ordAsoc.sl = ec.ordAsoc['ganancia'] - 30;	
+							}
+							
+						}
+						ext++;
 					}
 					
-					vela['Close'] = obj["movAcumEURUSD"];
-					vela['arrMov'].push(obj["movAcumEURUSD"]);
-					if(obj["movAcumEURUSD"] > vela['High']){
-						vela['High'] = obj["movAcumEURUSD"]; 
-					} else if(obj["movAcumEURUSD"] < vela['Low']){
-						vela['Low'] = obj["movAcumEURUSD"];
+					/**************************************************************/
+					
+					
+					
+					
+					vela.promedio = modelApp.promedioVela / modelApp.cantidadTRansVela;
+					vela.cantidad = modelApp.cantidadTRansVela;
+					
+					modelApp.promedioVela = 0;
+					modelApp.cantidadTRansVela = 0;
+					
+					if(opt == 'S'){
+						vela = {Open: obj["movAcumEURUSD"],  High: obj["movAcumEURUSD"], Low: obj["movAcumEURUSD"], Close:obj["movAcumEURUSD"]/*, arrMov: [obj["movAcumEURUSD"]]*/};
+						modelApp.arrDataGrafVelas.addItem(vela);	
+						modelApp.promedioVela += vela.close;
+						modelApp.cantidadTRansVela++;
+						
+					} else {/*
+						SE CREA VELA NUEVA QUE EN EL MOMENTO EN QUE LLEGA UN NUEVO MOVIMIENTO SE REINICIARA PARA QUE ESE MOVIMIENTO SE TOME COMO EL PRIMER TIC Y NO EL CIERRE ANTERIOR; 
+						SI LLEGASE A NO HABER MOV EN ESTA VELA ENTONCES SE DEJA COMO ESPACIO Y TENDRIA UNA VELA SIN MOVIMIENNTOS
+						*/
+						vela = modelApp.arrDataGrafVelas.source[modelApp.arrDataGrafVelas.length - 1];
+						vela = {Open: vela["Close"],  High: vela["Close"], Low: vela["Close"], Close: vela["Close"]/*, arrMov: []*/};
+						modelApp.arrDataGrafVelas.addItem(vela);	
+						vela = null;
 					}
-					//trace(vela);
-					modelApp.arrDataGrafVelas.setItemAt(vela, modelApp.arrDataGrafVelas.length - 1); 
+					modelApp.contVela++;
+					
+					
+				} else {
+					if(serie == 'S'){/************SI HAY MAS DE UN PIP EN EL MISMO SEGUNDO NO SUMO***********************/
+						modelApp.codPerIn++;	
+					}
+					
+					if(opt == 'S'){/************ACTUALIZO VELA***********************/
+						if(vela == null){
+							vela = {Open: obj["movAcumEURUSD"],  High: obj["movAcumEURUSD"], Low: obj["movAcumEURUSD"], Close:obj["movAcumEURUSD"]/*, arrMov: [obj["movAcumEURUSD"]]*/};
+							/*for each(ec in modelApp.arrTendencias){ ESTO EVALUABA CADA PIP Y ESO ERA MUCHO PROCESO, ADEMAS ES MAS IMPORTANTE EL CIERRE
+							vela[ec.id] = modelApp.contVela * ec.pendiente + ec.coefCorte;
+							}*/
+							modelApp.arrDataGrafVelas.setItemAt(vela, modelApp.arrDataGrafVelas.length - 1);
+						} else {
+							vela = modelApp.arrDataGrafVelas.source[modelApp.arrDataGrafVelas.length - 1];	
+						}
+						
+						vela['Close'] = obj["movAcumEURUSD"];
+						modelApp.promedioVela += vela.close;
+						modelApp.cantidadTRansVela++;
+						//vela['arrMov'].push(obj["movAcumEURUSD"]);
+						if(obj["movAcumEURUSD"] > vela['High']){
+							vela['High'] = obj["movAcumEURUSD"]; 
+						} else if(obj["movAcumEURUSD"] < vela['Low']){
+							vela['Low'] = obj["movAcumEURUSD"];
+						}
+						//trace(vela);
+						modelApp.arrDataGrafVelas.setItemAt(vela, modelApp.arrDataGrafVelas.length - 1); 
+					}
+					
 				}
 				
-			}
-			
-			modelApp.arrDataGraf.addItem(obj);
+				modelApp.arrDataGraf.addItem(obj);	
+			} catch (error : Error) {
+				//  TRACE
+				trace("_onDataReceived error:  " + error);
+			} 
 			//modelApp.arrDataGraf.refresh();
 			//modelApp.arrDataGrafVelas.refresh();
 			
