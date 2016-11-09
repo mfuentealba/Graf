@@ -22,6 +22,7 @@
 			import mx.charts.series.CandlestickSeries;
 			import mx.collections.ArrayCollection;
 			import mx.events.FlexEvent;
+			import mx.graphics.Stroke;
 			import mx.managers.PopUpManager;
 			
 			import spark.events.GridSelectionEvent;
@@ -304,7 +305,21 @@
 				c.setStyle('declineFill', down);
 				c.setStyle('stroke', wick);
 				c.setStyle('boxStroke', box);
-				modelApp.grVelas.series = [c];
+				
+				var rapida:LineSeries = new LineSeries();
+				rapida.yField = 'rapida';
+				rapida.setStyle('lineStroke', new Stroke(0xee2200));
+				
+				var lenta:LineSeries = new LineSeries();
+				lenta.yField = 'lenta';
+				lenta.setStyle('lineStroke', new Stroke(0x0022ee));
+				
+				modelApp.grVelas.series = [c, rapida, lenta];
+				
+				
+				
+				
+				
 			}
 			
 			protected function datagrid1_doubleClickHandler(event:MouseEvent):void
@@ -320,6 +335,12 @@
 					trace(e);
 				}
 				
+			}
+			
+			protected function txtVelas_changeHandler(event:TextOperationEvent):void
+			{
+				// TODO Auto-generated method stub
+				modelApp.maxVelas = Number(txtVelas.text);
 			}
 			
 		]]>
@@ -471,6 +492,8 @@
 						<s:TextInput id="txtStopLoss" width="86"/>
 						<s:Label text="TP"/>
 						<s:TextInput id="txtTakeProfit" width="80"/>
+						<s:Label text="VELAS"/>
+						<s:TextInput id="txtVelas" change="txtVelas_changeHandler(event)" width="80"/>
 					</s:HGroup>
 					<s:HGroup width="100%" height="100%">
 						<s:DataGrid id="dgOrdenes" width="80%" height="100%" requestedRowCount="4" doubleClickEnabled="true" doubleClick="datagrid1_doubleClickHandler(event)" dataProvider="{modelApp.arrDataGrafOrdExec}">

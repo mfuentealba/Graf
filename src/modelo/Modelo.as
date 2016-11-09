@@ -29,6 +29,10 @@ package modelo
 		public var promedioVela:Number = 0;
 		public var cantidadTRansVela:Number = 0;
 		
+		public var rapida:Number = 0;
+		public var lenta:Number = 0;
+		public var maxVelas:Number = 1441 * 4;
+		
 		
 		
 		

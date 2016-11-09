@@ -154,6 +154,30 @@ package controlador
 		}
 		
 		
+		
+		public function fnRecalculaOrden3(obj:*, index:int, array:Array):void{
+			if(obj.estado != 'Cerrado'){
+				modelApp.totalOperaciones = (Number(modelApp.totalOperaciones) - Number(obj['ganancia'])) + '';
+				obj['ganancia'] += movEURUSD['mov'] * (obj['tipo'] == 'C' ? 1 : -1);
+				obj['pip'] += movEURUSD['mov'] * (obj['tipo'] == 'C' ? 1 : -1);
+				obj['spread'] = movEURUSD['spread'];
+				modelApp.totalOperaciones = (Number(modelApp.totalOperaciones) + Number(obj['ganancia'])) + '';
+				if(obj.sl > obj['ganancia']){
+					obj.estado = 'Cerrado';
+				} else {
+					if(obj['ganancia'] > 30){
+						obj.sl = obj['ganancia'] - 30;
+					}
+					
+				}
+				/*if(obj.tp < obj['ganancia']){
+				obj.estado = 'Cerrado';
+				}*/
+			}			
+		}
+		
+		
+		
 		public function fnRecalculaOrden2(obj:*, index:int, array:Array, opt:String):void{
 			if(obj['divisa'] == 'EURUSD'){
 				
@@ -249,6 +273,36 @@ package controlador
 				item2.ecu = linea;
 			//}
 		}
+		
+		
+		private function fnGeneraOrdenLinea(tipo:String):void{
+					
+			//Graf(FlexGlobals.topLevelApplication).removeEventListener(GeneraDataEvent.AUTOGENERACION, Graf(FlexGlobals.topLevelApplication).fnCicloGenerador);
+					
+			var obj:Object = modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1];
+			var item2:Object = {};
+			
+			item2 = {};
+			item2.fecha = obj.fechaTrans;
+			item2.ganancia = -obj.spreadEURUSD;
+			item2.sl = -100;
+			item2.tp = 500;
+			item2.spread = -obj.spreadEURUSD;
+			item2.pip = 0;
+			item2.num = 'EURUSD|' + obj['id']; 
+			item2.divisa = 'EURUSD';
+			item2.tipo = tipo;
+			item2.movIni = obj["movAcumEURUSD"];
+			item2.estado = "Abierta";
+			modelApp.totalOperaciones = (int(modelApp.totalOperaciones) + item2.ganancia) + '';
+			modelApp.arrDataGrafOrdExec.addItem(item2);			
+			
+		}
+		
+		
+		
+		
+		
 		
 		private function callbackRecep(result:DataEvent):void{
 			var arrParam:Array = String(result.data).split('|');
@@ -501,6 +555,11 @@ package controlador
 					modelApp.promedioVela = 0;
 					modelApp.cantidadTRansVela = 0;
 					
+					/*
+					if(vela.promedio < vela.Close){
+						Graf(FlexGlobals.topLevelApplication).removeEventListener(GeneraDataEvent.AUTOGENERACION, Graf(FlexGlobals.topLevelApplication).fnCicloGenerador);
+					}*/
+					
 					
 					var item:Object;
 					
@@ -517,7 +576,7 @@ package controlador
 					var ptoElim:Object;
 					var a:NodoPendientes;
 					var n:int = modelApp.arrMinimos.length;
-					for(var j:int = 0; j < n; j++){//ELIMINO LOS PUNTOS BASE MENORES AL NUEVO
+					/*for(var j:int = 0; j < n; j++){//ELIMINO LOS PUNTOS BASE MENORES AL NUEVO
 						a = NodoPendientes(modelApp.arrMinimos.getItemAt(j));
 						if(a.ptoInicial['valor'] > objNuevo['valor']){
 							ptoElim = modelApp.arrMinimos.removeItemAt(j)['ptoInicial'];
@@ -540,9 +599,31 @@ package controlador
 							}	
 						}	
 						
+					}*/
+					modelApp.rapida += vela['Close'];
+					modelApp.lenta += vela['Close'];
+					if(modelApp.arrDataGrafVelas.length > 14){
+						modelApp.rapida -= modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 15)['Close'];
+						vela['rapida'] = modelApp.rapida / 14; 
+					}
+					
+					if(modelApp.arrDataGrafVelas.length > 70){
+						modelApp.lenta -= modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 71)['Close'];
+						vela['lenta'] = (modelApp.lenta - modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 71)['Close']) / 70; 
 					}
 					
 					
+					if(velaAnterior['rapida'] < velaAnterior['lenta'] && vela['rapida'] > vela['lenta']){
+						fnGeneraOrdenLinea('C');
+					}
+					
+					if(velaAnterior['rapida'] > velaAnterior['lenta'] && vela['rapida'] < vela['lenta']){
+						fnGeneraOrdenLinea('V');
+					}
+					
+					
+					modelApp.arrDataGrafOrdExec.source.forEach(fnRecalculaOrden3);
+					modelApp.arrDataGrafOrdExec.refresh();
 					
 					
 					if(velaAnterior['Open'] < velaAnterior['Close'] && vela['Open'] > vela['Close']){//verde-roja
@@ -590,7 +671,7 @@ package controlador
 						modelApp.objDataNiveles[item.movIni] = item;
 						}
 						*/
-						objNuevo.vela = vela;
+						/*objNuevo.vela = vela;
 						if(n == 0){
 							a = new NodoPendientes();
 							a.ptoInicial = objNuevo;
@@ -625,7 +706,13 @@ package controlador
 //											if(objNuevo['valor'] >= modelApp.proyeccionAlcista * objNuevo['num'] + modelApp.corteMinAlcista && objNuevo['valor'] - modelApp.proyeccionAlcista <= modelApp.proyeccionAlcista * objNuevo['num'] + modelApp.corteMinAlcista){
 											if(objNuevo['valor'] >= modelApp.proyeccionAlcista * objNuevo['num'] + modelApp.corteMinAlcista && objNuevo['valor'] - modelApp.proyeccionAlcista <= modelApp.proyeccionAlcista * objNuevo['num'] + modelApp.corteMinAlcista){
 												if(vela['promedio'] >= (vela['Close'] + vela['High']) / 2){
+													
+													
+													
 													fnGeneraLineaTendencia_y_orden(j, valorInicial, objNuevo, arrMin);
+													
+													
+													
 													nodo.arrayPosibles.removeItemAt(nodo.arrayPosibles.getItemIndex(arrPuntos));
 													m--;
 													s--;	
@@ -657,11 +744,11 @@ package controlador
 									nodo.arrayPosibles.addItem(new ArrayCollection([objNuevo]));
 								}
 							}	
-						}		
+						}*/		
 						
 					}
 					
-					var velaAux:Object = modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 1);
+					/*var velaAux:Object = modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 1);
 					var ext:int = 1;
 					for each(var ec:EcuacionRectaVO in modelApp.arrTendencias){					
 						velaAux[ec.id] = (modelApp.contVela) * ec.pendiente + ec.coefCorte;
@@ -691,7 +778,7 @@ package controlador
 							
 						}
 						ext++;
-					}
+					}*/
 					
 					/**************************************************************/
 					

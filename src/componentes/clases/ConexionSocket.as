@@ -122,7 +122,7 @@ package componentes.clases
 				//  TRACE
 				trace("_onDataReceived error:  " + error);
 			} 
-			if(modelApp.swEnvioClick && modelApp.contVela < 1442){
+			if(modelApp.swEnvioClick && modelApp.contVela < modelApp.maxVelas){
 				modelApp.swEnvioClick = false;
 				var generaDataEvent:GeneraDataEvent = new GeneraDataEvent(GeneraDataEvent.AUTOGENERACION);
 				FlexGlobals.topLevelApplication.dispatchEvent(generaDataEvent);
