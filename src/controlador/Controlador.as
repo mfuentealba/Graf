@@ -295,12 +295,12 @@ package controlador
 					
 					
 					
-					/*if(modelApp.arrDataGrafVelas.length > 120){
+					if(modelApp.arrDataGrafVelas.length > 120){
 						//modelApp.arrDataGraf = new ArrayCollection();
 						
 						modelApp.arrDataGrafVelas.removeItemAt(0);
 						
-					}*/
+					}
 					
 					modelApp.arrDataGrafOrdExec.source.forEach(fnRecalculaOrden);
 					modelApp.arrDataGrafOrdExec.refresh();
@@ -494,6 +494,14 @@ package controlador
 					vela = modelApp.arrDataGrafVelas.source[modelApp.arrDataGrafVelas.length - 1];
 					var velaAnterior:Object = modelApp.arrDataGrafVelas.source[modelApp.arrDataGrafVelas.length - 2];
 					
+					
+					vela.promedio = modelApp.promedioVela / modelApp.cantidadTRansVela;
+					vela.cantidad = modelApp.cantidadTRansVela;
+					
+					modelApp.promedioVela = 0;
+					modelApp.cantidadTRansVela = 0;
+					
+					
 					var item:Object;
 					
 					if(modelApp.contVela == 372){//1883
@@ -614,12 +622,15 @@ package controlador
 											var valorInicial:Object = nodo.ptoInicial;
 											modelApp.proyeccionAlcista = (valorInicial['valor'] - valorAnterior['valor']) / (valorInicial['num'] - valorAnterior['num']);
 											modelApp.corteMinAlcista = valorAnterior['valor'] - valorAnterior['num'] * modelApp.proyeccionAlcista;
+//											if(objNuevo['valor'] >= modelApp.proyeccionAlcista * objNuevo['num'] + modelApp.corteMinAlcista && objNuevo['valor'] - modelApp.proyeccionAlcista <= modelApp.proyeccionAlcista * objNuevo['num'] + modelApp.corteMinAlcista){
 											if(objNuevo['valor'] >= modelApp.proyeccionAlcista * objNuevo['num'] + modelApp.corteMinAlcista && objNuevo['valor'] - modelApp.proyeccionAlcista <= modelApp.proyeccionAlcista * objNuevo['num'] + modelApp.corteMinAlcista){
+												if(vela['promedio'] >= (vela['Close'] + vela['High']) / 2){
+													fnGeneraLineaTendencia_y_orden(j, valorInicial, objNuevo, arrMin);
+													nodo.arrayPosibles.removeItemAt(nodo.arrayPosibles.getItemIndex(arrPuntos));
+													m--;
+													s--;	
+												}
 												
-												fnGeneraLineaTendencia_y_orden(j, valorInicial, objNuevo, arrMin);
-												nodo.arrayPosibles.removeItemAt(nodo.arrayPosibles.getItemIndex(arrPuntos));
-												m--;
-												s--;
 												
 											} else {
 												if(objNuevo['valor'] < modelApp.proyeccionAlcista * objNuevo['num'] + modelApp.corteMinAlcista){
@@ -687,11 +698,7 @@ package controlador
 					
 					
 					
-					vela.promedio = modelApp.promedioVela / modelApp.cantidadTRansVela;
-					vela.cantidad = modelApp.cantidadTRansVela;
 					
-					modelApp.promedioVela = 0;
-					modelApp.cantidadTRansVela = 0;
 					
 					if(opt == 'S'){
 						vela = {Open: obj["movAcumEURUSD"],  High: obj["movAcumEURUSD"], Low: obj["movAcumEURUSD"], Close:obj["movAcumEURUSD"]/*, arrMov: [obj["movAcumEURUSD"]]*/};
