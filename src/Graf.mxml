@@ -496,7 +496,7 @@
 						<s:TextInput id="txtVelas" change="txtVelas_changeHandler(event)" width="80"/>
 					</s:HGroup>
 					<s:HGroup width="100%" height="100%">
-						<s:DataGrid id="dgOrdenes" width="80%" height="100%" requestedRowCount="4" doubleClickEnabled="true" doubleClick="datagrid1_doubleClickHandler(event)" dataProvider="{modelApp.arrDataGrafOrdExec}">
+						<s:DataGrid id="dgOrdenes" width="80%" height="100%" requestedRowCount="4" doubleClickEnabled="true" doubleClick="datagrid1_doubleClickHandler(event)" dataProvider="{modelApp.arrDataGrafOrdExecGrilla}">
 							<s:columns>
 								<s:ArrayList>
 									<s:GridColumn dataField="num" headerText="Num"></s:GridColumn>

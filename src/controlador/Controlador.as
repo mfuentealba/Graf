@@ -166,10 +166,13 @@ package controlador
 					obj.estado = 'Cerrado';
 				} else {
 					if(obj['ganancia'] > 30){
-						obj.sl = obj['ganancia'] - 30;
+						if(obj.sl < obj['ganancia'] - 30){
+							obj.sl = obj['ganancia'] - 30;	
+						}
 					}
 					
 				}
+				
 				/*if(obj.tp < obj['ganancia']){
 				obj.estado = 'Cerrado';
 				}*/
@@ -269,6 +272,7 @@ package controlador
 				item2.estado = "Abierta";
 				modelApp.totalOperaciones = (int(modelApp.totalOperaciones) + item2.ganancia) + '';
 				modelApp.arrDataGrafOrdExec.addItem(item2);
+				modelApp.arrDataGrafOrdExecGrilla.addItem(item2);
 				linea.ordAsoc = item2;
 				item2.ecu = linea;
 			//}
@@ -277,7 +281,7 @@ package controlador
 		
 		private function fnGeneraOrdenLinea(tipo:String):void{
 					
-			//Graf(FlexGlobals.topLevelApplication).removeEventListener(GeneraDataEvent.AUTOGENERACION, Graf(FlexGlobals.topLevelApplication).fnCicloGenerador);
+			Graf(FlexGlobals.topLevelApplication).removeEventListener(GeneraDataEvent.AUTOGENERACION, Graf(FlexGlobals.topLevelApplication).fnCicloGenerador);
 					
 			var obj:Object = modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1];
 			var item2:Object = {};
@@ -295,7 +299,8 @@ package controlador
 			item2.movIni = obj["movAcumEURUSD"];
 			item2.estado = "Abierta";
 			modelApp.totalOperaciones = (int(modelApp.totalOperaciones) + item2.ganancia) + '';
-			modelApp.arrDataGrafOrdExec.addItem(item2);			
+			modelApp.arrDataGrafOrdExec.addItem(item2);
+			modelApp.arrDataGrafOrdExecGrilla.addItem(item2);
 			
 		}
 		
@@ -602,32 +607,42 @@ package controlador
 					}*/
 					modelApp.rapida += vela['Close'];
 					modelApp.lenta += vela['Close'];
-					if(modelApp.arrDataGrafVelas.length > 14){
-						modelApp.rapida -= modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 15)['Close'];
-						vela['rapida'] = modelApp.rapida / 14; 
+					if(modelApp.arrDataGrafVelas.length > 10){
+						modelApp.rapida -= modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 11)['Close'];
+						vela['rapida'] = modelApp.rapida / 10; 
 					}
 					
-					if(modelApp.arrDataGrafVelas.length > 70){
-						modelApp.lenta -= modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 71)['Close'];
-						vela['lenta'] = (modelApp.lenta - modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 71)['Close']) / 70; 
+					if(modelApp.arrDataGrafVelas.length > 20){
+						modelApp.lenta -= modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 21)['Close'];
+						vela['lenta'] = modelApp.lenta / 20; 
 					}
 					
 					
-					/*if(velaAnterior['rapida'] < velaAnterior['lenta'] && vela['rapida'] > vela['lenta']){
+					if(velaAnterior['rapida'] < velaAnterior['lenta'] && vela['rapida'] > vela['lenta']){
+						if(modelApp.arrDataGrafOrdExec.length > 0){
+							if(modelApp.arrDataGrafOrdExec.getItemAt(modelApp.arrDataGrafOrdExec.length - 1)['ganancia'] < 0){
+								modelApp.arrDataGrafOrdExec.getItemAt(modelApp.arrDataGrafOrdExec.length - 1)['estado'] = 'Cerrado';
+								modelApp.arrDataGrafOrdExec.removeItemAt(modelApp.arrDataGrafOrdExec.length - 1)
+							}
+								
+						}
+						
 						fnGeneraOrdenLinea('C');
 					}
 					
 					if(velaAnterior['rapida'] > velaAnterior['lenta'] && vela['rapida'] < vela['lenta']){
-						fnGeneraOrdenLinea('V');
-					}*/
-					
-					if(velaAnterior['rapida'] < velaAnterior['Close'] && vela['Close'] > vela['lenta']){
+						if(modelApp.arrDataGrafOrdExec.length > 0){
+							if(modelApp.arrDataGrafOrdExec.getItemAt(modelApp.arrDataGrafOrdExec.length - 1)['ganancia'] < 0){
+								modelApp.arrDataGrafOrdExec.getItemAt(modelApp.arrDataGrafOrdExec.length - 1)['estado'] = 'Cerrado';
+								modelApp.arrDataGrafOrdExec.removeItemAt(modelApp.arrDataGrafOrdExec.length - 1)
+							}
+								
+						}
 						fnGeneraOrdenLinea('V');
 					}
 					
-					if(velaAnterior['rapida'] > velaAnterior['Close'] && vela['Close'] < vela['lenta']){
-						fnGeneraOrdenLinea('C');
-					}
+					
+					
 					
 					
 					
@@ -637,6 +652,14 @@ package controlador
 					
 					
 					if(velaAnterior['Open'] < velaAnterior['Close'] && vela['Open'] > vela['Close']){//verde-roja
+						
+						/*if(vela['rapida'] < vela['Close'] && vela['Close'] > vela['lenta']){
+							fnGeneraOrdenLinea('V');
+						}*/
+						
+						
+						
+						
 						/*var nivel:int = vela['High'] <= velaAnterior['High'] ? velaAnterior['High'] : vela['High'];
 						if(modelApp.objDataNiveles.hasOwnProperty('EURUSD|' + nivel)){
 						var i:int = modelApp.arrDataNiveles.getItemIndex(modelApp.objDataNiveles['EURUSD|' + nivel]);
@@ -661,6 +684,12 @@ package controlador
 						
 						
 					} else if(vela['Open'] < vela['Close'] && velaAnterior['Open'] > velaAnterior['Close']){//roja-verde
+						
+						
+						
+						/*if(vela['rapida'] > vela['Close'] && vela['Close'] < vela['lenta']){
+							fnGeneraOrdenLinea('C');
+						}*/
 						/*nivel = vela['Low'] <= velaAnterior['Low'] ? vela['Low'] : velaAnterior['Low'];  
 						if(modelApp.objDataNiveles.hasOwnProperty('EURUSD|' + nivel)){
 						i = modelApp.arrDataNiveles.getItemIndex(modelApp.objDataNiveles['EURUSD|' + nivel]);

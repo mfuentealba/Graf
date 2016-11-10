@@ -59,6 +59,7 @@ package modelo
 		public var codPerIn:int = 0;
 		public var arrDataGrafOrd:ArrayCollection = new ArrayCollection();
 		public var arrDataGrafOrdExec:ArrayCollection = new ArrayCollection();
+		public var arrDataGrafOrdExecGrilla:ArrayCollection = new ArrayCollection();
 		public var objDataGrafOrdExec:Object = {};
 		public var arrDataNiveles:ArrayCollection = new ArrayCollection();
 		public var objDataNiveles:Object = {};
