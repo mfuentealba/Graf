@@ -613,13 +613,23 @@ package controlador
 					}
 					
 					
-					if(velaAnterior['rapida'] < velaAnterior['lenta'] && vela['rapida'] > vela['lenta']){
+					/*if(velaAnterior['rapida'] < velaAnterior['lenta'] && vela['rapida'] > vela['lenta']){
 						fnGeneraOrdenLinea('C');
 					}
 					
 					if(velaAnterior['rapida'] > velaAnterior['lenta'] && vela['rapida'] < vela['lenta']){
 						fnGeneraOrdenLinea('V');
+					}*/
+					
+					if(velaAnterior['rapida'] < velaAnterior['Close'] && vela['Close'] > vela['lenta']){
+						fnGeneraOrdenLinea('V');
 					}
+					
+					if(velaAnterior['rapida'] > velaAnterior['Close'] && vela['Close'] < vela['lenta']){
+						fnGeneraOrdenLinea('C');
+					}
+					
+					
 					
 					
 					modelApp.arrDataGrafOrdExec.source.forEach(fnRecalculaOrden3);
