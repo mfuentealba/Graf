@@ -277,7 +277,7 @@ package controlador
 		
 		private function fnGeneraOrdenLinea(tipo:String):void{
 					
-			//Graf(FlexGlobals.topLevelApplication).removeEventListener(GeneraDataEvent.AUTOGENERACION, Graf(FlexGlobals.topLevelApplication).fnCicloGenerador);
+			Graf(FlexGlobals.topLevelApplication).removeEventListener(GeneraDataEvent.AUTOGENERACION, Graf(FlexGlobals.topLevelApplication).fnCicloGenerador);
 					
 			var obj:Object = modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1];
 			var item2:Object = {};
@@ -602,14 +602,14 @@ package controlador
 					}*/
 					modelApp.rapida += vela['Close'];
 					modelApp.lenta += vela['Close'];
-					if(modelApp.arrDataGrafVelas.length > 14){
-						modelApp.rapida -= modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 15)['Close'];
-						vela['rapida'] = modelApp.rapida / 14; 
+					if(modelApp.arrDataGrafVelas.length > 10){
+						modelApp.rapida -= modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 11)['Close'];
+						vela['rapida'] = modelApp.rapida / 10; 
 					}
 					
-					if(modelApp.arrDataGrafVelas.length > 70){
-						modelApp.lenta -= modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 71)['Close'];
-						vela['lenta'] = (modelApp.lenta - modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 71)['Close']) / 70; 
+					if(modelApp.arrDataGrafVelas.length > 20){
+						modelApp.lenta -= modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 21)['Close'];
+						vela['lenta'] = modelApp.lenta / 20; 
 					}
 					
 					
