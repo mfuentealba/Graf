@@ -69,6 +69,11 @@ package modelo
 		public var txtUSDCHF:String;
 		public var txtSec:String;
 		
+		
+		public var ordenEnabled:Boolean = true;
+		public var ordenEnabledConfirm:int = 0;
+		
+		
 		public var objDataGrafPR:Object = {};
 		
 		

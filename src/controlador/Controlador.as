@@ -581,6 +581,31 @@ package controlador
 					var ptoElim:Object;
 					var a:NodoPendientes;
 					var n:int = modelApp.arrMinimos.length;
+					
+					
+					if(modelApp.arrDataGrafVelas.length > 20){
+						if(Math.abs(vela['rapida'] - vela['lenta']) < 5){
+							modelApp.ordenEnabledConfirm++;
+							if(modelApp.ordenEnabledConfirm > 5){
+								modelApp.ordenEnabledConfirm = 5;
+							}
+						} else {
+							modelApp.ordenEnabledConfirm--;
+							if(modelApp.ordenEnabledConfirm < 0){
+								modelApp.ordenEnabledConfirm = 0;
+							}
+						}
+						
+						
+						if(modelApp.ordenEnabledConfirm > 4){
+							modelApp.ordenEnabled = false;
+						} else {
+							modelApp.ordenEnabled = true;
+						}	
+					}
+					
+					
+					
 					/*for(var j:int = 0; j < n; j++){//ELIMINO LOS PUNTOS BASE MENORES AL NUEVO
 						a = NodoPendientes(modelApp.arrMinimos.getItemAt(j));
 						if(a.ptoInicial['valor'] > objNuevo['valor']){
@@ -896,7 +921,7 @@ package controlador
 						}
 						
 						
-						if(velaAnterior['rapida'] < velaAnterior['lenta'] && vela['rapida'] > vela['lenta'] && !vela.hasOwnProperty('orden')){
+						if(velaAnterior['rapida'] < velaAnterior['lenta'] && vela['rapida'] > vela['lenta'] && !vela.hasOwnProperty('orden') && modelApp.ordenEnabled){
 							if(modelApp.arrDataGrafOrdExec.length > 0){
 								if(modelApp.arrDataGrafOrdExec.getItemAt(modelApp.arrDataGrafOrdExec.length - 1)['ganancia'] < 0){
 									modelApp.arrDataGrafOrdExec.getItemAt(modelApp.arrDataGrafOrdExec.length - 1)['estado'] = 'Cerrado';
@@ -908,7 +933,7 @@ package controlador
 							fnGeneraOrdenLinea('C');
 						}
 						
-						if(velaAnterior['rapida'] > velaAnterior['lenta'] && vela['rapida'] < vela['lenta'] && !vela.hasOwnProperty('orden')){
+						if(velaAnterior['rapida'] > velaAnterior['lenta'] && vela['rapida'] < vela['lenta'] && !vela.hasOwnProperty('orden') && modelApp.ordenEnabled){
 							if(modelApp.arrDataGrafOrdExec.length > 0){
 								if(modelApp.arrDataGrafOrdExec.getItemAt(modelApp.arrDataGrafOrdExec.length - 1)['ganancia'] < 0){
 									modelApp.arrDataGrafOrdExec.getItemAt(modelApp.arrDataGrafOrdExec.length - 1)['estado'] = 'Cerrado';
