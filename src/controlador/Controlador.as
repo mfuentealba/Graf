@@ -605,11 +605,13 @@ package controlador
 						}	
 						
 					}*/
+					
+					/*
 					modelApp.rapida += vela['Close'];
 					modelApp.lenta += vela['Close'];
-					if(modelApp.arrDataGrafVelas.length > 10){
-						modelApp.rapida -= modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 11)['Close'];
-						vela['rapida'] = modelApp.rapida / 10; 
+					if(modelApp.arrDataGrafVelas.length > 4){
+						modelApp.rapida -= modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 5)['Close'];
+						vela['rapida'] = modelApp.rapida / 4; 
 					}
 					
 					if(modelApp.arrDataGrafVelas.length > 20){
@@ -618,7 +620,7 @@ package controlador
 					}
 					
 					
-					if(velaAnterior['rapida'] < velaAnterior['lenta'] && vela['rapida'] > vela['lenta']){
+					if(velaAnterior['rapida'] < velaAnterior['lenta'] && vela['rapida'] > vela['lenta'] && !vela.hasOwnProperty('orden')){
 						if(modelApp.arrDataGrafOrdExec.length > 0){
 							if(modelApp.arrDataGrafOrdExec.getItemAt(modelApp.arrDataGrafOrdExec.length - 1)['ganancia'] < 0){
 								modelApp.arrDataGrafOrdExec.getItemAt(modelApp.arrDataGrafOrdExec.length - 1)['estado'] = 'Cerrado';
@@ -626,11 +628,11 @@ package controlador
 							}
 								
 						}
-						
+						vela['orden'] = true;
 						fnGeneraOrdenLinea('C');
 					}
 					
-					if(velaAnterior['rapida'] > velaAnterior['lenta'] && vela['rapida'] < vela['lenta']){
+					if(velaAnterior['rapida'] > velaAnterior['lenta'] && vela['rapida'] < vela['lenta'] && !vela.hasOwnProperty('orden')){
 						if(modelApp.arrDataGrafOrdExec.length > 0){
 							if(modelApp.arrDataGrafOrdExec.getItemAt(modelApp.arrDataGrafOrdExec.length - 1)['ganancia'] < 0){
 								modelApp.arrDataGrafOrdExec.getItemAt(modelApp.arrDataGrafOrdExec.length - 1)['estado'] = 'Cerrado';
@@ -638,11 +640,12 @@ package controlador
 							}
 								
 						}
+						vela['orden'] = true;
 						fnGeneraOrdenLinea('V');
 					}
 					
 					
-					
+					*/
 					
 					
 					
@@ -855,7 +858,8 @@ package controlador
 							/*for each(ec in modelApp.arrTendencias){ ESTO EVALUABA CADA PIP Y ESO ERA MUCHO PROCESO, ADEMAS ES MAS IMPORTANTE EL CIERRE
 							vela[ec.id] = modelApp.contVela * ec.pendiente + ec.coefCorte;
 							}*/
-							modelApp.arrDataGrafVelas.setItemAt(vela, modelApp.arrDataGrafVelas.length - 1);
+							
+							
 						} else {
 							vela = modelApp.arrDataGrafVelas.source[modelApp.arrDataGrafVelas.length - 1];	
 						}
@@ -870,8 +874,55 @@ package controlador
 							vela['Low'] = obj["movAcumEURUSD"];
 						}
 						//trace(vela);
-						modelApp.arrDataGrafVelas.setItemAt(vela, modelApp.arrDataGrafVelas.length - 1); 
+						modelApp.arrDataGrafVelas.setItemAt(vela, modelApp.arrDataGrafVelas.length - 1);
+						velaAnterior = modelApp.arrDataGrafVelas.source[modelApp.arrDataGrafVelas.length - 2];
+						modelApp.arrDataGrafVelas.setItemAt(vela, modelApp.arrDataGrafVelas.length - 1);
+						
+						
+						if(modelApp.arrDataGrafVelas.length > 4){
+							modelApp.rapida -= modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 5)['Close'];
+							modelApp.rapida += vela['Close'];
+							vela['rapida'] = modelApp.rapida / 4;
+							modelApp.rapida -= vela['Close'];
+							modelApp.rapida += modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 5)['Close'];
+						}
+						
+						if(modelApp.arrDataGrafVelas.length > 20){
+							modelApp.lenta -= modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 21)['Close'];
+							modelApp.lenta += vela['Close'];
+							vela['lenta'] = modelApp.lenta / 20;
+							modelApp.lenta -= vela['Close'];
+							modelApp.lenta += modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 21)['Close'];
+						}
+						
+						
+						if(velaAnterior['rapida'] < velaAnterior['lenta'] && vela['rapida'] > vela['lenta'] && !vela.hasOwnProperty('orden')){
+							if(modelApp.arrDataGrafOrdExec.length > 0){
+								if(modelApp.arrDataGrafOrdExec.getItemAt(modelApp.arrDataGrafOrdExec.length - 1)['ganancia'] < 0){
+									modelApp.arrDataGrafOrdExec.getItemAt(modelApp.arrDataGrafOrdExec.length - 1)['estado'] = 'Cerrado';
+									modelApp.arrDataGrafOrdExec.removeItemAt(modelApp.arrDataGrafOrdExec.length - 1)
+								}
+								
+							}
+							vela['orden'] = true;
+							fnGeneraOrdenLinea('C');
+						}
+						
+						if(velaAnterior['rapida'] > velaAnterior['lenta'] && vela['rapida'] < vela['lenta'] && !vela.hasOwnProperty('orden')){
+							if(modelApp.arrDataGrafOrdExec.length > 0){
+								if(modelApp.arrDataGrafOrdExec.getItemAt(modelApp.arrDataGrafOrdExec.length - 1)['ganancia'] < 0){
+									modelApp.arrDataGrafOrdExec.getItemAt(modelApp.arrDataGrafOrdExec.length - 1)['estado'] = 'Cerrado';
+									modelApp.arrDataGrafOrdExec.removeItemAt(modelApp.arrDataGrafOrdExec.length - 1)
+								}
+								
+							}
+							vela['orden'] = true;
+							fnGeneraOrdenLinea('V');
+						}
 					}
+					
+					
+					
 					
 				}
 				
