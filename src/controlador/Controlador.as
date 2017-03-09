@@ -582,8 +582,14 @@ package controlador
 					var a:NodoPendientes;
 					var n:int = modelApp.arrMinimos.length;
 					
-					
+					/*
 					if(modelApp.arrDataGrafVelas.length > 20){
+						
+						
+						
+						
+						INDICADOR MEDIA MOVIL
+						
 						if(Math.abs(vela['rapida'] - vela['lenta']) < 5){
 							modelApp.ordenEnabledConfirm++;
 							if(modelApp.ordenEnabledConfirm > 5){
@@ -602,11 +608,11 @@ package controlador
 						} else {
 							modelApp.ordenEnabled = true;
 						}	
-					}
+					}*/
 					
 					
 					
-					/*for(var j:int = 0; j < n; j++){//ELIMINO LOS PUNTOS BASE MENORES AL NUEVO
+					for(var j:int = 0; j < n; j++){//ELIMINO LOS PUNTOS BASE MENORES AL NUEVO
 						a = NodoPendientes(modelApp.arrMinimos.getItemAt(j));
 						if(a.ptoInicial['valor'] > objNuevo['valor']){
 							ptoElim = modelApp.arrMinimos.removeItemAt(j)['ptoInicial'];
@@ -629,9 +635,11 @@ package controlador
 							}	
 						}	
 						
-					}*/
+					}
 					
 					/*
+					INDICADOR MEDIA MOVIL
+					
 					modelApp.rapida += vela['Close'];
 					modelApp.lenta += vela['Close'];
 					if(modelApp.arrDataGrafVelas.length > 4){
@@ -681,32 +689,35 @@ package controlador
 					
 					if(velaAnterior['Open'] < velaAnterior['Close'] && vela['Open'] > vela['Close']){//verde-roja
 						
-						/*if(vela['rapida'] < vela['Close'] && vela['Close'] > vela['lenta']){
+						/*
+						INDICADOR MEDIA MOVIL
+						
+						if(vela['rapida'] < vela['Close'] && vela['Close'] > vela['lenta']){
 							fnGeneraOrdenLinea('V');
 						}*/
 						
 						
 						
 						
-						/*var nivel:int = vela['High'] <= velaAnterior['High'] ? velaAnterior['High'] : vela['High'];
+						var nivel:int = vela['High'] <= velaAnterior['High'] ? velaAnterior['High'] : vela['High'];
 						if(modelApp.objDataNiveles.hasOwnProperty('EURUSD|' + nivel)){
-						var i:int = modelApp.arrDataNiveles.getItemIndex(modelApp.objDataNiveles['EURUSD|' + nivel]);
-						item = modelApp.arrDataNiveles.getItemAt(i);
-						item.mov = 'Resistencia';
-						item.cant++;						
-						var dist:int = modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'] - item.arrSec[item.arrSec.length - 1]['sec']; 
-						item.arrSec.addItem({sec: modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'], dist: dist, vela: modelApp.arrDataGrafVelas.length - 1, accion: 'resistencia'});
-						modelApp.arrDataNiveles.setItemAt(item, i);
+							var i:int = modelApp.arrDataNiveles.getItemIndex(modelApp.objDataNiveles['EURUSD|' + nivel]);
+							item = modelApp.arrDataNiveles.getItemAt(i);
+							item.mov = 'Resistencia';
+							item.cant++;						
+							var dist:int = modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'] - item.arrSec[item.arrSec.length - 1]['sec']; 
+							item.arrSec.addItem({sec: modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'], dist: dist, vela: modelApp.arrDataGrafVelas.length - 1, accion: 'resistencia'});
+							modelApp.arrDataNiveles.setItemAt(item, i);
 						} else {
-						item = {};			
-						item.movIni = 'EURUSD|' + nivel;
-						item.divisa = 'EURUSD';
-						item.mov = 'Resistencia';
-						item.cant = 1;
-						item.arrSec = new ArrayCollection([{sec: modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'], dist: 0, vela: modelApp.arrDataGrafVelas.length - 1, accion: 'resistencia'}]);
-						modelApp.arrDataNiveles.addItem(item);
-						modelApp.objDataNiveles[item.movIni] = item;
-						}*/
+							item = {};			
+							item.movIni = 'EURUSD|' + nivel;
+							item.divisa = 'EURUSD';
+							item.mov = 'Resistencia';
+							item.cant = 1;
+							item.arrSec = new ArrayCollection([{sec: modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'], dist: 0, vela: modelApp.arrDataGrafVelas.length - 1, accion: 'resistencia'}]);
+							modelApp.arrDataNiveles.addItem(item);
+							modelApp.objDataNiveles[item.movIni] = item;
+						}
 						
 						
 						
@@ -715,7 +726,11 @@ package controlador
 						
 						
 						
-						/*if(vela['rapida'] > vela['Close'] && vela['Close'] < vela['lenta']){
+						/*
+						
+						INDICADOR MEDIAS
+						
+						if(vela['rapida'] > vela['Close'] && vela['Close'] < vela['lenta']){
 							fnGeneraOrdenLinea('C');
 						}*/
 						/*nivel = vela['Low'] <= velaAnterior['Low'] ? vela['Low'] : velaAnterior['Low'];  
@@ -738,7 +753,9 @@ package controlador
 						modelApp.objDataNiveles[item.movIni] = item;
 						}
 						*/
-						/*objNuevo.vela = vela;
+						
+						
+						objNuevo.vela = vela;
 						if(n == 0){
 							a = new NodoPendientes();
 							a.ptoInicial = objNuevo;
@@ -811,11 +828,11 @@ package controlador
 									nodo.arrayPosibles.addItem(new ArrayCollection([objNuevo]));
 								}
 							}	
-						}*/		
+						}		
 						
 					}
 					
-					/*var velaAux:Object = modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 1);
+					var velaAux:Object = modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 1);
 					var ext:int = 1;
 					for each(var ec:EcuacionRectaVO in modelApp.arrTendencias){					
 						velaAux[ec.id] = (modelApp.contVela) * ec.pendiente + ec.coefCorte;
@@ -845,7 +862,7 @@ package controlador
 							
 						}
 						ext++;
-					}*/
+					}
 					
 					/**************************************************************/
 					
